@@ -1,0 +1,54 @@
+# AgroMap-Cereté · entorno completo en Docker
+#   docker compose up -d --build
+#   docker compose exec backend node dist/scripts/seed.js   (datos de ejemplo)
+# Frontend: http://localhost:8080 · API: http://localhost:3000/api/v1 · Docs: http://localhost:3000/docs
+
+name: agromap
+
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27018:27017" # 27018 en el host para no chocar con un MongoDB local
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - apps/backend/.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/agromap
+      CORS_ORIGIN: http://localhost:8080
+      COOKIE_SECURE: "false"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+
+volumes:
+  mongo-data:

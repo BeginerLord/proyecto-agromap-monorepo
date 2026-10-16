@@ -47,6 +47,27 @@ pnpm dev
 | API | http://localhost:3000/api/v1 |
 | Documentación (Scalar) | http://localhost:3000/docs |
 
+## Con Docker
+
+Levanta MongoDB, la API y el frontend (nginx) sin instalar nada más que Docker. Requiere
+`apps/backend/.env` (cópialo desde `.env.example`).
+
+```bash
+docker compose up -d --build
+docker compose exec backend node dist/scripts/seed.js
+```
+
+| Servicio | URL |
+| --- | --- |
+| Aplicación | http://localhost:8080 |
+| API | http://localhost:3000/api/v1 (también vía http://localhost:8080/api/v1) |
+| Documentación (Scalar) | http://localhost:3000/docs |
+| MongoDB (contenedor) | mongodb://localhost:27018/agromap |
+
+nginx sirve el build de Vue y hace de proxy de `/api` y `/docs` hacia el backend, así que las
+cookies de sesión son del mismo origen. Los datos de Mongo persisten en el volumen `mongo-data`
+(`docker compose down -v` los borra).
+
 ## Scripts (raíz)
 
 | Script | Descripción |
