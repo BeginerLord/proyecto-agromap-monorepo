@@ -1,0 +1,19 @@
+{
+  "name": "agromap-cerete",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgroMap-Cereté: mapeo y gestión de cultivos en predios periurbanos para la seguridad alimentaria estudiantil",
+  "packageManager": "pnpm@10.8.0",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter \"./apps/*\" dev",
+    "dev:api": "pnpm --filter @agromap/backend dev",
+    "dev:web": "pnpm --filter @agromap/frontend dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "typecheck": "pnpm -r --filter \"./apps/*\" typecheck",
+    "seed": "pnpm --filter @agromap/backend seed"
+  }
+}
