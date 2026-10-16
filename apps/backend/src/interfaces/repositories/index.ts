@@ -1,6 +1,15 @@
-import type { CropStatus, DeviceStatus, FieldLogType, HarvestQuality, PlotStatus } from '../../constants/domain.js'
+import type {
+  CommentAuthorRole,
+  CommentStatus,
+  CropStatus,
+  DeviceStatus,
+  FieldLogType,
+  HarvestQuality,
+  PlotStatus,
+} from '../../constants/domain.js'
 import type { Role } from '../../constants/roles.js'
 import type {
+  Comment,
   Crop,
   Device,
   Distribution,
@@ -8,6 +17,7 @@ import type {
   FieldLog,
   GeoPolygon,
   Harvest,
+  Media,
   Plot,
   PlotCharacterization,
   PlotLocation,
@@ -16,7 +26,7 @@ import type {
   User,
   UserWithSecrets,
 } from '../entities/index.js'
-import type { IBaseRepository } from './base-repository.interface.js'
+import type { Filter, IBaseRepository } from './base-repository.interface.js'
 
 export * from './base-repository.interface.js'
 
@@ -108,7 +118,7 @@ export interface IHarvestRepository extends IBaseRepository<Harvest, CreateHarve
   releaseKg(id: string, quantityKg: number): Promise<void>
 }
 
-// ─── Distribuciones (jornadas sabatinas) ─────────────────
+// ─── Distribuciones (jornadas de apoyo) ──────────────────
 export interface CreateDistributionData {
   date: Date
   title: string
@@ -158,4 +168,50 @@ export interface CreateSensorReadingData {
 export interface ISensorReadingRepository
   extends IBaseRepository<SensorReading, CreateSensorReadingData> {
   insertMany(readings: CreateSensorReadingData[]): Promise<number>
+}
+
+// ─── Evidencias (fotos) ──────────────────────────────────
+export interface CreateMediaData {
+  url: string
+  storageKey: string
+  mimeType: string
+  size: number
+  caption?: string
+  plot?: string
+  crop?: string
+  distribution?: string
+  isPublic?: boolean
+  takenAt?: Date
+  uploadedBy: string
+}
+export interface UpdateMediaData {
+  caption?: string
+  isPublic?: boolean
+}
+export interface IMediaRepository extends IBaseRepository<Media, CreateMediaData, UpdateMediaData> {
+  findPublic(filter: Filter, limit: number): Promise<Media[]>
+  /** Cantidad de fotos públicas y la más reciente (portada) por predio. */
+  coversByPlot(plotIds: string[]): Promise<Map<string, { url: string; count: number }>>
+  publicByDistribution(distributionIds: string[]): Promise<Map<string, Media[]>>
+}
+
+// ─── Experiencias (comentarios) ──────────────────────────
+export interface CreateCommentData {
+  authorName: string
+  authorRole: CommentAuthorRole
+  message: string
+  rating?: number
+  plot?: string
+  distribution?: string
+  status?: CommentStatus
+  ipHash?: string
+}
+export interface UpdateCommentData {
+  status?: CommentStatus
+  moderatedBy?: string
+  moderatedAt?: Date
+}
+export interface ICommentRepository extends IBaseRepository<Comment, CreateCommentData, UpdateCommentData> {
+  approvedCountByDistribution(distributionIds: string[]): Promise<Map<string, number>>
+  countByStatus(): Promise<Partial<Record<CommentStatus, number>>>
 }

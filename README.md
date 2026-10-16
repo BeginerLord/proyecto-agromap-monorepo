@@ -1,8 +1,11 @@
 # AgroMap-Cereté
 
 Herramienta de mapeo y seguimiento de cultivos en predios periurbanos (Martínez y Mateo Gómez) para
-fortalecer la seguridad alimentaria de los estudiantes en las jornadas sabatinas del Centro Tutorial
-Cereté – Universidad de Cartagena.
+fortalecer la seguridad alimentaria de los estudiantes mediante jornadas de apoyo alimentario (entre semana
+y fines de semana) del Centro Tutorial Cereté – Universidad de Cartagena.
+
+Incluye un **sitio público** (predios con fotos de evidencia, jornadas de apoyo y experiencias de la
+comunidad) y un **panel de administración** para el equipo del proyecto.
 
 Monorepo administrado con **pnpm workspaces**:
 
@@ -43,7 +46,8 @@ pnpm dev
 
 | Servicio | URL |
 | --- | --- |
-| Frontend | http://localhost:5173 |
+| Sitio público | http://localhost:5173 |
+| Panel de administración | http://localhost:5173/panel |
 | API | http://localhost:3000/api/v1 |
 | Documentación (Scalar) | http://localhost:3000/docs |
 
@@ -59,14 +63,15 @@ docker compose exec backend node dist/scripts/seed.js
 
 | Servicio | URL |
 | --- | --- |
-| Aplicación | http://localhost:8080 |
+| Sitio público | http://localhost:8080 |
+| Panel de administración | http://localhost:8080/panel |
 | API | http://localhost:3000/api/v1 (también vía http://localhost:8080/api/v1) |
 | Documentación (Scalar) | http://localhost:3000/docs |
 | MongoDB (contenedor) | mongodb://localhost:27018/agromap |
 
-nginx sirve el build de Vue y hace de proxy de `/api` y `/docs` hacia el backend, así que las
-cookies de sesión son del mismo origen. Los datos de Mongo persisten en el volumen `mongo-data`
-(`docker compose down -v` los borra).
+nginx sirve el build de Vue y hace de proxy de `/api`, `/uploads` y `/docs` hacia el backend, así que las
+cookies de sesión son del mismo origen. Los datos de Mongo y las fotos subidas persisten en los volúmenes
+`mongo-data` y `uploads` (`docker compose down -v` los borra).
 
 ## Scripts (raíz)
 
@@ -106,7 +111,19 @@ sesión se invalidan los anteriores (`tokenVersion`). El frontend nunca lee ni g
 
 **Roles:** `admin`, `agronomist`, `farmer`, `student`.
 
-**Módulos:** auth, usuarios, dashboard, predios, cultivos, bitácora, cosechas, jornadas sabatinas y sensores.
+**Módulos:** auth, usuarios, dashboard, predios, cultivos, bitácora, cosechas, jornadas de apoyo,
+evidencias (fotos), experiencias (comentarios con moderación), sitio público y sensores.
+
+### Sitio público y evidencias
+
+- `GET /api/v1/public/*` expone predios activos, jornadas, galería y experiencias aprobadas **sin datos
+  privados** (ni propietarios, ni teléfonos, ni usuarios).
+- `POST /api/v1/public/comments` recibe experiencias de la comunidad: quedan *pendientes* hasta que un
+  administrador o agrónomo las apruebe (`/panel/comments`). Tiene límite de envíos y un campo trampa anti-bots.
+- `POST /api/v1/media` sube fotos (JPG/PNG/WEBP, máx. `UPLOAD_MAX_MB`) asociadas a un predio, cultivo o
+  jornada. El tipo se valida por los bytes del archivo, no por la extensión. El almacenamiento usa el
+  adapter `IFileStorage` (`src/adapters/storage`): hoy disco local en `/uploads`, intercambiable por S3 o
+  Cloudinary.
 
 ### Sensores (patrón Adapter)
 
@@ -121,13 +138,13 @@ proveedores. Para conectar el hardware real basta con escribir un adapter y regi
 src/
 ├── api/          Cliente HTTP (axios + cookies) y endpoints por recurso
 ├── assets/       Logo
-├── components/   ui/ (base) · layout/ · map/ · dominio (plots, crops, …)
+├── components/   ui/ (base) · layout/ · public/ · media/ · map/ · dominio (plots, crops, …)
 ├── composables/  usePaginatedList, useAsyncAction
 ├── constants/    Rutas, roles, etiquetas y configuración
-├── layouts/      AuthLayout, AppLayout
+├── layouts/      PublicLayout, AuthLayout, AppLayout
 ├── models/       Tipos de dominio
-├── pages/        Una vista por ruta
-├── router/       Rutas y guards (autenticación y roles)
+├── pages/        public/ (sitio abierto) y vistas del panel
+├── router/       Sitio público en `/`, panel en `/panel` (guards de sesión y roles)
 ├── services/     Lógica de presentación sobre la API
 ├── stores/       Pinia (sesión, notificaciones)
 ├── styles/       Tokens de diseño y estilos base

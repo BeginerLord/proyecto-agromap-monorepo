@@ -7,7 +7,7 @@ export interface Harvest {
   plot: PlotRef
   harvestedAt: Date
   quantityKg: number
-  /** Kilos aún disponibles para distribuir en jornadas sabatinas. */
+  /** Kilos aún disponibles para distribuir en las jornadas de apoyo. */
   availableKg: number
   quality: HarvestQuality
   notes?: string

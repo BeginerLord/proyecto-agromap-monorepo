@@ -61,6 +61,12 @@ export const env = Object.freeze({
     timeWindow: optional('RATE_LIMIT_WINDOW', '1 minute'),
   },
 
+  uploads: {
+    dir: resolve(process.cwd(), optional('UPLOADS_DIR', 'uploads')),
+    publicPath: '/uploads/',
+    maxFileSizeMb: toNumber('UPLOAD_MAX_MB', 5),
+  },
+
   sensors: {
     enabled: toBoolean('SENSORS_ENABLED', true),
     defaultProvider: optional('SENSOR_DEFAULT_PROVIDER', 'mock'),

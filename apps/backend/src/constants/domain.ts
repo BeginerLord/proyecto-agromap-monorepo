@@ -28,4 +28,16 @@ export type HarvestQuality = (typeof HARVEST_QUALITY)[number]
 export const DEVICE_STATUS = ['active', 'inactive', 'unknown'] as const
 export type DeviceStatus = (typeof DEVICE_STATUS)[number]
 
+export const COMMENT_STATUS = ['pending', 'approved', 'rejected'] as const
+export type CommentStatus = (typeof COMMENT_STATUS)[number]
+
+/** Cómo se identifica quien deja su experiencia en el sitio público. */
+export const COMMENT_AUTHOR_ROLES = ['student', 'volunteer', 'farmer', 'teacher', 'visitor'] as const
+export type CommentAuthorRole = (typeof COMMENT_AUTHOR_ROLES)[number]
+
+export const MEDIA_RULES = {
+  MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  MAX_FILES_PER_REQUEST: 1,
+} as const
+
 export const PAGINATION = { DEFAULT_PAGE: 1, DEFAULT_LIMIT: 20, MAX_LIMIT: 100 } as const

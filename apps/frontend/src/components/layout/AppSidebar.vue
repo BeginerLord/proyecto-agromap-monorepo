@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import logoMark from '@/assets/logo-mark.png'
+import UdecSignature from '@/components/public/UdecSignature.vue'
 import BaseIcon, { type IconName } from '@/components/ui/BaseIcon.vue'
-import { APP_NAME, APP_SUBTITLE, ROLES, ROUTE_NAMES, type RouteName } from '@/constants'
+import { APP_NAME, APP_SUBTITLE, ROLE_GROUPS, ROLES, ROUTE_NAMES, type RouteName } from '@/constants'
 import { useAuthStore } from '@/stores/auth.store'
 
 defineProps<{ open: boolean }>()
@@ -13,6 +14,7 @@ interface NavItem {
   label: string
   icon: IconName
   adminOnly?: boolean
+  managersOnly?: boolean
 }
 
 const sections: { title: string; items: NavItem[] }[] = [
@@ -29,13 +31,14 @@ const sections: { title: string; items: NavItem[] }[] = [
     title: 'Alimentos',
     items: [
       { to: ROUTE_NAMES.HARVESTS, label: 'Cosechas', icon: 'basket' },
-      { to: ROUTE_NAMES.DISTRIBUTIONS, label: 'Jornadas sabatinas', icon: 'calendar' },
+      { to: ROUTE_NAMES.DISTRIBUTIONS, label: 'Jornadas de apoyo', icon: 'calendar' },
     ],
   },
   {
     title: 'Sistema',
     items: [
       { to: ROUTE_NAMES.SENSORS, label: 'Sensores', icon: 'sensor' },
+      { to: ROUTE_NAMES.COMMENTS, label: 'Experiencias', icon: 'notebook', managersOnly: true },
       { to: ROUTE_NAMES.USERS, label: 'Usuarios', icon: 'users', adminOnly: true },
     ],
   },
@@ -45,7 +48,10 @@ const auth = useAuthStore()
 const visibleSections = computed(() =>
   sections.map((section) => ({
     ...section,
-    items: section.items.filter((item) => !item.adminOnly || auth.hasRole([ROLES.ADMIN])),
+    items: section.items.filter(
+      (item) =>
+        (!item.adminOnly || auth.hasRole([ROLES.ADMIN])) && (!item.managersOnly || auth.hasRole(ROLE_GROUPS.MANAGERS)),
+    ),
   })),
 )
 </script>
@@ -79,7 +85,11 @@ const visibleSections = computed(() =>
     </nav>
 
     <div class="sidebar__foot">
-      <p class="faint">Centro Tutorial Cereté<br />Universidad de Cartagena</p>
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="nav__link" @click="emit('navigate')">
+        <BaseIcon name="arrow" />
+        <span>Ver sitio público</span>
+      </RouterLink>
+      <UdecSignature :size="44" />
     </div>
   </aside>
 </template>
@@ -165,7 +175,14 @@ const visibleSections = computed(() =>
 }
 .sidebar__foot {
   margin-top: auto;
-  padding: 0 var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+.sidebar__foot :deep(.udec) {
+  padding: 0 var(--space-2);
 }
 @media (max-width: 960px) {
   .sidebar {

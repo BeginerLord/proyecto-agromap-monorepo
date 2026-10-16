@@ -3,35 +3,45 @@
  * Es el único lugar que conoce las implementaciones concretas (inyección de dependencias manual).
  */
 import { createDefaultRegistry } from './adapters/sensors/index.js'
+import { LocalFileStorage } from './adapters/storage/index.js'
+import { env } from './config/env.js'
 import {
   AuthController,
+  CommentController,
   CropController,
   DashboardController,
   DistributionController,
   FieldLogController,
   HarvestController,
+  MediaController,
   PlotController,
+  PublicController,
   SensorController,
   UserController,
 } from './controllers/index.js'
 import {
+  CommentRepository,
   CropRepository,
   DeviceRepository,
   DistributionRepository,
   FieldLogRepository,
   HarvestRepository,
+  MediaRepository,
   PlotRepository,
   SensorReadingRepository,
   UserRepository,
 } from './repositories/index.js'
 import {
   AuthService,
+  CommentService,
   CropService,
   DashboardService,
   DistributionService,
   FieldLogService,
   HarvestService,
+  MediaService,
   PlotService,
+  PublicService,
   SensorService,
   UserService,
 } from './services/index.js'
@@ -39,6 +49,7 @@ import { BcryptPasswordHasher, tokenService } from './utils/index.js'
 
 // Adapters
 export const sensorRegistry = createDefaultRegistry()
+const fileStorage = new LocalFileStorage(env.uploads.dir, env.uploads.publicPath)
 
 // Repositorios
 const repositories = {
@@ -50,6 +61,8 @@ const repositories = {
   distributions: new DistributionRepository(),
   devices: new DeviceRepository(),
   readings: new SensorReadingRepository(),
+  media: new MediaRepository(),
+  comments: new CommentRepository(),
 }
 
 // Servicios
@@ -75,6 +88,22 @@ const services = {
     repositories.plots,
     repositories.crops,
   ),
+  media: new MediaService(
+    repositories.media,
+    fileStorage,
+    repositories.plots,
+    repositories.crops,
+    repositories.distributions,
+  ),
+  comments: new CommentService(repositories.comments, repositories.plots, repositories.distributions),
+  public: new PublicService(
+    repositories.plots,
+    repositories.crops,
+    repositories.harvests,
+    repositories.distributions,
+    repositories.media,
+    repositories.comments,
+  ),
 }
 
 // Controladores
@@ -88,6 +117,9 @@ export const controllers = {
   distributions: new DistributionController(services.distributions),
   dashboard: new DashboardController(services.dashboard),
   sensors: new SensorController(services.sensors),
+  media: new MediaController(services.media),
+  comments: new CommentController(services.comments),
+  public: new PublicController(services.public, services.comments),
 }
 
 export type Controllers = typeof controllers

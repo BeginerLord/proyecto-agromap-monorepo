@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import logoFull from '@/assets/logo-full.png'
+import { ROUTE_NAMES } from '@/constants'
 </script>
 
 <template>
@@ -20,15 +21,16 @@ import logoFull from '@/assets/logo-full.png'
       <div class="auth__blob auth__blob--leaf" />
       <div class="auth__copy">
         <p class="eyebrow auth__eyebrow">Seguridad alimentaria estudiantil</p>
-        <h2>Del predio periurbano a la mesa de la jornada sabatina.</h2>
+        <h2>Del predio periurbano a la mesa de los estudiantes.</h2>
         <p>
           Georreferencia los predios de Martínez y Mateo Gómez, planifica cultivos de ciclo corto y
-          anticipa qué alimentos estarán disponibles cada sábado.
+          anticipa qué alimentos estarán disponibles en cada jornada de apoyo.
         </p>
       </div>
     </section>
 
     <section class="auth__panel">
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="auth__back">← Volver al sitio</RouterLink>
       <img :src="logoFull" alt="AgroMap" class="auth__logo" width="150" />
       <RouterView />
     </section>
@@ -98,6 +100,11 @@ import logoFull from '@/assets/logo-full.png'
   gap: var(--space-8);
   padding: var(--space-12) clamp(24px, 6vw, 72px);
   background: var(--paper);
+}
+.auth__back {
+  align-self: flex-start;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
 }
 .auth__logo {
   height: auto;
