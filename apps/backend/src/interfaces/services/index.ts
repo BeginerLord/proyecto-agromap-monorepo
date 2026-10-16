@@ -22,15 +22,30 @@ import type {
   UpdateUserDto,
   UserQueryDto,
   PaginationQueryDto,
+  CommentQueryDto,
+  CreatePublicCommentDto,
+  MediaQueryDto,
+  ModerateCommentDto,
+  PublicCommentQueryDto,
+  PublicGalleryQueryDto,
+  PublicDistributionDto,
+  PublicMediaDto,
+  PublicOverviewDto,
+  PublicPlotDetailDto,
+  PublicPlotDto,
+  UpdateMediaDto,
+  UploadMediaFields,
 } from '../../dtos/index.js'
 import type { AuthTokens, AuthUser } from '../common/auth.interface.js'
 import type { PaginatedResult } from '../common/pagination.interface.js'
 import type {
+  Comment,
   Crop,
   Device,
   Distribution,
   FieldLog,
   Harvest,
+  Media,
   Plot,
   SensorReading,
   User,
@@ -115,4 +130,34 @@ export interface ISensorService {
   listReadings(deviceId: string, query: ReadingQueryDto): Promise<PaginatedResult<SensorReading>>
   syncDevice(deviceId: string): Promise<IngestResultDto>
   ingest(provider: string, payload: unknown): Promise<IngestResultDto>
+}
+
+export interface UploadedFile {
+  buffer: Buffer
+  originalName: string
+}
+
+export interface IMediaService {
+  list(query: MediaQueryDto): Promise<PaginatedResult<Media>>
+  upload(file: UploadedFile, fields: UploadMediaFields, actor: AuthUser): Promise<Media>
+  update(id: string, dto: UpdateMediaDto, actor: AuthUser): Promise<Media>
+  remove(id: string, actor: AuthUser): Promise<void>
+}
+
+export interface ICommentService {
+  list(query: CommentQueryDto): Promise<PaginatedResult<Comment>>
+  stats(): Promise<Record<string, number>>
+  submit(dto: CreatePublicCommentDto, ip: string): Promise<{ message: string; status: Comment['status'] }>
+  moderate(id: string, dto: ModerateCommentDto, actor: AuthUser): Promise<Comment>
+  remove(id: string): Promise<void>
+}
+
+/** Lectura pública (sin autenticación) con datos depurados. */
+export interface IPublicService {
+  overview(): Promise<PublicOverviewDto>
+  plots(): Promise<{ data: PublicPlotDto[] }>
+  plot(id: string): Promise<PublicPlotDetailDto>
+  distributions(query: PaginationQueryDto): Promise<PaginatedResult<PublicDistributionDto>>
+  gallery(query: PublicGalleryQueryDto): Promise<PublicMediaDto[]>
+  comments(query: PublicCommentQueryDto): Promise<PaginatedResult<Comment>>
 }

@@ -1,12 +1,15 @@
 import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox'
 import Type from 'typebox'
 import { authRoutes } from './auth.routes.js'
+import { commentRoutes } from './comment.routes.js'
 import { cropRoutes } from './crop.routes.js'
 import { dashboardRoutes } from './dashboard.routes.js'
 import { distributionRoutes } from './distribution.routes.js'
 import { fieldLogRoutes } from './field-log.routes.js'
 import { harvestRoutes } from './harvest.routes.js'
+import { mediaRoutes } from './media.routes.js'
 import { plotRoutes } from './plot.routes.js'
+import { publicRoutes } from './public.routes.js'
 import { sensorRoutes } from './sensor.routes.js'
 import { userRoutes } from './user.routes.js'
 
@@ -30,4 +33,7 @@ export const apiRoutes: FastifyPluginAsyncTypebox = async (app) => {
   await app.register(harvestRoutes, { prefix: '/harvests' })
   await app.register(distributionRoutes, { prefix: '/distributions' })
   await app.register(sensorRoutes, { prefix: '/sensors' })
+  await app.register(mediaRoutes, { prefix: '/media' })
+  await app.register(commentRoutes, { prefix: '/comments' })
+  await app.register(publicRoutes, { prefix: '/public' })
 }

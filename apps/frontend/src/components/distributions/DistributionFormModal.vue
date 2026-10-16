@@ -11,12 +11,12 @@ const emit = defineEmits<{ saved: [distribution: Distribution] }>()
 
 const harvests = ref<Harvest[]>([])
 const quantities = reactive<Record<string, number | ''>>({})
-const form = reactive({ date: distributionService.nextSaturday(), title: '', beneficiaries: '' as number | '', notes: '' })
+const form = reactive({ date: distributionService.today(), title: '', beneficiaries: '' as number | '', notes: '' })
 const { pending, run } = useAsyncAction()
 
 watch(open, async (value) => {
   if (!value) return
-  Object.assign(form, { date: distributionService.nextSaturday(), title: '', beneficiaries: '', notes: '' })
+  Object.assign(form, { date: distributionService.today(), title: '', beneficiaries: '', notes: '' })
   harvests.value = await harvestService.available()
   for (const key of Object.keys(quantities)) delete quantities[key]
 })

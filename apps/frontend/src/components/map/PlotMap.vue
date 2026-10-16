@@ -3,7 +3,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { MAP_DEFAULTS } from '@/constants/app'
-import type { Plot } from '@/models'
+import type { GeoPoint, GeoPolygon } from '@/models'
 import { escapeHtml } from '@/utils/format'
 import { toLatLng } from '@/utils/geo'
 
@@ -11,9 +11,17 @@ import { toLatLng } from '@/utils/geo'
  * Mapa de predios. Usa marcadores propios (divIcon) en lugar de los PNG por defecto
  * de Leaflet para mantener la estética plana y evitar problemas de assets con Vite.
  */
+/** Lo mínimo que el mapa necesita de un predio (sirve para el panel y el sitio público). */
+export interface MapPlot {
+  id: string
+  name: string
+  location: { district: string; point: GeoPoint }
+  boundary?: GeoPolygon
+}
+
 const props = withDefaults(
   defineProps<{
-    plots?: Plot[]
+    plots?: MapPlot[]
     height?: string
     /** Modo selección: un clic coloca/mueve el marcador y emite las coordenadas. */
     pickable?: boolean
@@ -23,7 +31,7 @@ const props = withDefaults(
   { plots: () => [], height: '420px', picked: null },
 )
 
-const emit = defineEmits<{ pick: [coords: { lat: number; lng: number }]; select: [plot: Plot] }>()
+const emit = defineEmits<{ pick: [coords: { lat: number; lng: number }]; select: [plot: MapPlot] }>()
 
 const container = ref<HTMLDivElement>()
 let map: L.Map | null = null

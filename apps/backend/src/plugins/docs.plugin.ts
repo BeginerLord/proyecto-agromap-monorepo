@@ -18,7 +18,7 @@ export const docsPlugin = fp(async (app: FastifyInstance) => {
         version: '0.1.0',
         description:
           'API para el mapeo, caracterización y seguimiento de cultivos en predios periurbanos ' +
-          '(Martínez y Mateo Gómez) y la distribución de alimentos en las jornadas sabatinas del ' +
+          '(Martínez y Mateo Gómez) y la distribución de alimentos en las jornadas de apoyo alimentario del ' +
           'Centro Tutorial Cereté – Universidad de Cartagena.\n\n' +
           '**Autenticación:** la sesión viaja únicamente en cookies `httpOnly`. ' +
           'Ejecuta `POST /auth/login` desde esta documentación y las siguientes peticiones enviarán la cookie automáticamente.',
@@ -26,6 +26,7 @@ export const docsPlugin = fp(async (app: FastifyInstance) => {
       servers: [{ url: `http://localhost:${env.port}`, description: 'Local' }],
       tags: [
         { name: 'Sistema' },
+        { name: 'Público', description: 'Sitio público: predios, jornadas, galería y experiencias (sin autenticación)' },
         { name: 'Auth', description: 'Registro, inicio y cierre de sesión (JWT en cookies httpOnly)' },
         { name: 'Usuarios', description: 'Administración de usuarios y roles' },
         { name: 'Dashboard' },
@@ -33,7 +34,9 @@ export const docsPlugin = fp(async (app: FastifyInstance) => {
         { name: 'Cultivos', description: 'Cultivos de ciclo corto por predio' },
         { name: 'Bitácora', description: 'Registros de campo por cultivo' },
         { name: 'Cosechas' },
-        { name: 'Jornadas sabatinas', description: 'Entregas de alimentos a estudiantes' },
+        { name: 'Jornadas de apoyo', description: 'Entregas de alimentos a estudiantes' },
+        { name: 'Evidencias', description: 'Fotos de predios, cultivos y jornadas' },
+        { name: 'Experiencias', description: 'Moderación de comentarios del sitio público' },
         { name: 'Sensores (adapter)', description: 'Integración desacoplada con dispositivos IoT' },
       ],
       components: {
