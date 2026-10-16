@@ -1,0 +1,102 @@
+/*
+ * AgroMap · Design tokens
+ * Paleta plana (sin degradados) derivada del verde del logo #066C20.
+ * Inspiración: hoja, tierra, sol de cosecha, agua de riego y papel cálido.
+ */
+:root {
+  /* ── Marca · Hoja ─────────────────────────── */
+  --leaf-900: #0b3b1a;
+  --leaf-800: #04521a;
+  --leaf-700: #066c20; /* color del logo */
+  --leaf-600: #2e8540;
+  --leaf-300: #a9cfa6;
+  --leaf-100: #e4f0e3;
+  --leaf-50: #f1f7ef;
+
+  /* ── Tierra ───────────────────────────────── */
+  --soil-700: #6f4a2f;
+  --soil-500: #8b5e3c;
+  --soil-100: #f3e8dc;
+
+  /* ── Sol / cosecha ────────────────────────── */
+  --sun-700: #9a6a0c;
+  --sun-500: #d99a1e;
+  --sun-100: #fbf0d6;
+
+  /* ── Agua / información ───────────────────── */
+  --water-700: #24576f;
+  --water-500: #2f6f8f;
+  --water-100: #ddebf1;
+
+  /* ── Arcilla / peligro ────────────────────── */
+  --clay-700: #8f3422;
+  --clay-500: #b9472f;
+  --clay-100: #f7e1da;
+
+  /* ── Neutros cálidos ──────────────────────── */
+  --paper: #f7f4ec; /* fondo de la app */
+  --surface: #fffdf8; /* tarjetas */
+  --sand: #efe9db; /* superficies hundidas / sidebar */
+  --line: #e3dccb;
+  --line-strong: #cfc6b1;
+  --ink: #1e2b21;
+  --ink-2: #4f5e52;
+  --ink-3: #879284;
+
+  /* ── Semánticos ───────────────────────────── */
+  --color-bg: var(--paper);
+  --color-surface: var(--surface);
+  --color-muted: var(--sand);
+  --color-border: var(--line);
+  --color-text: var(--ink);
+  --color-text-soft: var(--ink-2);
+  --color-text-faint: var(--ink-3);
+  --color-primary: var(--leaf-700);
+  --color-primary-hover: var(--leaf-800);
+  --color-primary-soft: var(--leaf-100);
+  --color-focus: var(--leaf-300);
+  --color-success: var(--leaf-700);
+  --color-warning: var(--sun-500);
+  --color-danger: var(--clay-500);
+  --color-info: var(--water-500);
+
+  /* ── Tipografía ───────────────────────────── */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  /* ── Espaciado (base 4px) ─────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Formas orgánicas ─────────────────────── */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+  /* "hoja": esquinas opuestas redondeadas */
+  --radius-leaf: 28px 6px 28px 6px;
+  --radius-leaf-sm: 16px 4px 16px 4px;
+
+  /* Sombras mínimas y planas */
+  --shadow-sm: 0 1px 0 rgba(30, 43, 33, 0.06);
+  --shadow-md: 0 2px 0 rgba(30, 43, 33, 0.05), 0 8px 24px rgba(30, 43, 33, 0.06);
+
+  --sidebar-width: 248px;
+  --topbar-height: 64px;
+  --transition: 160ms ease;
+}
