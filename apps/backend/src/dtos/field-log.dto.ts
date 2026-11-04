@@ -1,5 +1,5 @@
 import Type, { type Static } from 'typebox'
-import { FIELD_LOG_TYPES } from '../constants/domain.js'
+import { FIELD_LOG_SOURCES, FIELD_LOG_TYPES } from '../constants/domain.js'
 import {
   CropRefDto,
   DateTime,
@@ -38,6 +38,7 @@ export const FieldLogQueryDto = Type.Object({
   cropId: Type.Optional(ObjectId),
   plotId: Type.Optional(ObjectId),
   type: Type.Optional(FieldLogTypeDto),
+  source: Type.Optional(StringEnum(FIELD_LOG_SOURCES)),
 })
 export type FieldLogQueryDto = Static<typeof FieldLogQueryDto>
 
@@ -49,7 +50,20 @@ export const FieldLogResponseDto = Type.Object({
   type: FieldLogTypeDto,
   description: Type.String(),
   photos: Type.Array(Type.String()),
-  author: UserRefDto,
+  author: Type.Optional(UserRefDto),
+  source: StringEnum(FIELD_LOG_SOURCES),
+  sensor: Type.Optional(
+    Type.Object({
+      device: Type.String(),
+      deviceName: Type.String(),
+      metric: Type.String(),
+      value: Type.Number(),
+      unit: Type.Optional(Type.String()),
+      condition: StringEnum(['low', 'high'] as const),
+      threshold: Type.Number(),
+      recordedAt: DateTime,
+    }),
+  ),
   ...TimestampsDto,
 })
 

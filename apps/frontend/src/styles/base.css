@@ -182,3 +182,23 @@ textarea {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
 }
+
+/* ── Impresión (reportes a PDF) ────────────── */
+@media print {
+  .sidebar,
+  .topbar,
+  .no-print,
+  .toasts {
+    display: none !important;
+  }
+  .shell__main {
+    margin-left: 0 !important;
+  }
+  body {
+    background: #fff;
+  }
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}

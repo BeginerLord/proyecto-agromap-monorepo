@@ -18,6 +18,8 @@ const deviceSchema = new Schema(
     status: { type: String, enum: DEVICE_STATUS, default: 'unknown' },
     lastSeenAt: { type: Date },
     metadata: { type: Schema.Types.Mixed },
+    /** Rangos propios por métrica ({ soil_moisture: { min, max } }); si faltan, se usan los por defecto. */
+    thresholds: { type: Schema.Types.Mixed },
   },
   { timestamps: true, collection: 'devices' },
 )

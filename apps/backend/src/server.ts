@@ -12,6 +12,7 @@ async function bootstrap() {
 
     await app.listen({ host: env.host, port: env.port })
     app.log.info(`📚 Documentación: http://localhost:${env.port}/docs`)
+    if (env.auth.bypass) app.log.warn('⚠️  AUTH_BYPASS activo: el panel no exige inicio de sesión')
   } catch (error) {
     app.log.fatal({ err: error }, 'No se pudo iniciar el servidor')
     process.exit(1)

@@ -16,6 +16,7 @@ import {
   MediaController,
   PlotController,
   PublicController,
+  ReportController,
   SensorController,
   UserController,
 } from './controllers/index.js'
@@ -28,6 +29,7 @@ import {
   HarvestRepository,
   MediaRepository,
   PlotRepository,
+  ReportRepository,
   SensorReadingRepository,
   UserRepository,
 } from './repositories/index.js'
@@ -42,6 +44,8 @@ import {
   MediaService,
   PlotService,
   PublicService,
+  ReportService,
+  SensorAlertService,
   SensorService,
   UserService,
 } from './services/index.js'
@@ -63,6 +67,7 @@ const repositories = {
   readings: new SensorReadingRepository(),
   media: new MediaRepository(),
   comments: new CommentRepository(),
+  reports: new ReportRepository(),
 }
 
 // Servicios
@@ -87,6 +92,7 @@ const services = {
     repositories.readings,
     repositories.plots,
     repositories.crops,
+    new SensorAlertService(repositories.fieldLogs, repositories.crops),
   ),
   media: new MediaService(
     repositories.media,
@@ -95,6 +101,7 @@ const services = {
     repositories.crops,
     repositories.distributions,
   ),
+  reports: new ReportService(repositories.reports),
   comments: new CommentService(repositories.comments, repositories.plots, repositories.distributions),
   public: new PublicService(
     repositories.plots,
@@ -120,6 +127,7 @@ export const controllers = {
   media: new MediaController(services.media),
   comments: new CommentController(services.comments),
   public: new PublicController(services.public, services.comments),
+  reports: new ReportController(services.reports),
 }
 
 export type Controllers = typeof controllers

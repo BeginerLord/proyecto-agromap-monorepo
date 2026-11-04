@@ -1,6 +1,6 @@
 import { ROLES } from '../constants/roles.js'
 import type { CreateFieldLogDto, FieldLogQueryDto, UpdateFieldLogDto } from '../dtos/index.js'
-import { ForbiddenException, NotFoundException } from '../exceptions/index.js'
+import { BadRequestException, ForbiddenException, NotFoundException } from '../exceptions/index.js'
 import type { AuthUser } from '../interfaces/common/auth.interface.js'
 import type { PaginatedResult } from '../interfaces/common/pagination.interface.js'
 import type { FieldLog } from '../interfaces/entities/index.js'
@@ -21,6 +21,7 @@ export class FieldLogService implements IFieldLogService {
       ...(query.cropId && { crop: query.cropId }),
       ...(query.plotId && { plot: query.plotId }),
       ...(query.type && { type: query.type }),
+      ...(query.source && { source: query.source }),
     }
     return toPaginated(await this.logs.findMany({ ...pagination, filter }), pagination)
   }
@@ -32,6 +33,9 @@ export class FieldLogService implements IFieldLogService {
   }
 
   async create(dto: CreateFieldLogDto, actor: AuthUser): Promise<FieldLog> {
+    if (dto.type === 'sensor_alert') {
+      throw new BadRequestException('Las alertas de sensor solo las registra el sistema')
+    }
     const crop = await this.crops.findById(dto.cropId)
     if (!crop) throw new NotFoundException('Cultivo', dto.cropId)
     return this.logs.create({
@@ -60,7 +64,7 @@ export class FieldLogService implements IFieldLogService {
   /** Solo el autor o un administrador pueden modificar un registro. */
   private async assertCanModify(id: string, actor: AuthUser): Promise<void> {
     const log = await this.getById(id)
-    if (log.author.id !== actor.id && actor.role !== ROLES.ADMIN) {
+    if (log.author?.id !== actor.id && actor.role !== ROLES.ADMIN) {
       throw new ForbiddenException('Solo el autor puede modificar este registro')
     }
   }

@@ -9,7 +9,8 @@ RUN pnpm install --frozen-lockfile --filter @agromap/frontend...
 COPY apps/frontend apps/frontend
 # La API se consume por el mismo origen (nginx hace de proxy de /api)
 ARG VITE_API_URL=/api/v1
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_AUTH_BYPASS=false
+ENV VITE_API_URL=$VITE_API_URL VITE_AUTH_BYPASS=$VITE_AUTH_BYPASS
 RUN pnpm --filter @agromap/frontend build
 
 # ─── Servidor estático ──────────────────────────────────

@@ -19,6 +19,7 @@ export const ROUTE_NAMES = {
   SENSORS: 'sensors',
   USERS: 'users',
   COMMENTS: 'comments',
+  REPORTS: 'reports',
   NOT_FOUND: 'not-found',
 } as const
 

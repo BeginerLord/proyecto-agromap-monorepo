@@ -46,6 +46,9 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
+      args:
+        # Panel sin login (temporal): mantener igual que AUTH_BYPASS en apps/backend/.env
+        VITE_AUTH_BYPASS: "true"
     restart: unless-stopped
     depends_on:
       backend:

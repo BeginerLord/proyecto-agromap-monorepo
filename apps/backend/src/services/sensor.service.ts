@@ -2,6 +2,7 @@ import type { ISensorAdapter } from '../adapters/sensors/sensor-adapter.interfac
 import type { SensorAdapterRegistry } from '../adapters/sensors/sensor-adapter.registry.js'
 import type { NormalizedReading } from '../adapters/sensors/sensor.types.js'
 import { env } from '../config/env.js'
+import { DEFAULT_SENSOR_THRESHOLDS } from '../constants/domain.js'
 import type {
   CreateDeviceDto,
   IngestResultDto,
@@ -19,7 +20,7 @@ import type {
   IPlotRepository,
   ISensorReadingRepository,
 } from '../interfaces/repositories/index.js'
-import type { ISensorService, ProviderInfo } from '../interfaces/services/index.js'
+import type { ISensorAlertService, ISensorService, ProviderInfo } from '../interfaces/services/index.js'
 import { compact, dateRangeFilter, resolvePagination, searchFilter, toPaginated } from '../utils/index.js'
 
 /**
@@ -33,12 +34,15 @@ export class SensorService implements ISensorService {
     private readonly readings: ISensorReadingRepository,
     private readonly plots: IPlotRepository,
     private readonly crops: ICropRepository,
+    private readonly alerts: ISensorAlertService,
   ) {}
 
-  providers(): { enabled: boolean; providers: ProviderInfo[] } {
+  providers() {
     return {
       enabled: env.sensors.enabled,
-      providers: this.registry.list().map((adapter) => ({
+      alertsEnabled: env.sensors.alertsEnabled,
+      defaultThresholds: DEFAULT_SENSOR_THRESHOLDS,
+      providers: this.registry.list().map((adapter): ProviderInfo => ({
         key: adapter.key,
         displayName: adapter.displayName,
         configured: adapter.isConfigured(),
@@ -139,10 +143,17 @@ export class SensorService implements ISensorService {
     }
 
     const stored = await this.readings.insertMany(docs)
+
+    // Retroalimentación: lecturas fuera de rango → alertas en la bitácora
+    let alerts = 0
+    for (const device of deviceCache.values()) {
+      if (!device) continue
+      alerts += await this.alerts.evaluate(device, docs.filter((doc) => doc.device === device.id))
+    }
     await Promise.all(
       [...lastSeen].map(([id, date]) => this.devices.updateById(id, { lastSeenAt: date, status: 'active' })),
     )
-    return { provider: adapter.key, received: normalized.length, stored, skipped: normalized.length - stored }
+    return { provider: adapter.key, received: normalized.length, stored, skipped: normalized.length - stored, alerts }
   }
 
   private resolveAdapter(provider: string): ISensorAdapter {

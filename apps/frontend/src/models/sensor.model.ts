@@ -1,5 +1,10 @@
 import type { CropRef, ISODate, PaginationQuery, PlotRef, Timestamps } from './common.model'
 
+export interface MetricThreshold {
+  min?: number
+  max?: number
+}
+
 export type DeviceStatus = 'active' | 'inactive' | 'unknown'
 
 export interface SensorProvider {
@@ -21,6 +26,7 @@ export interface Device extends Timestamps {
   status: DeviceStatus
   lastSeenAt?: ISODate
   metadata?: Record<string, unknown>
+  thresholds?: Record<string, MetricThreshold>
 }
 
 export interface DevicePayload {
@@ -55,4 +61,6 @@ export interface SyncResult {
   received: number
   stored: number
   skipped: number
+  /** Alertas registradas en la bitácora por lecturas fuera de rango. */
+  alerts: number
 }

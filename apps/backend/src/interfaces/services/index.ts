@@ -121,7 +121,12 @@ export interface ProviderInfo {
 }
 
 export interface ISensorService {
-  providers(): { enabled: boolean; providers: ProviderInfo[] }
+  providers(): {
+    enabled: boolean
+    alertsEnabled: boolean
+    defaultThresholds: Record<string, import('../../constants/domain.js').MetricThreshold>
+    providers: ProviderInfo[]
+  }
   listDevices(query: PaginationQueryDto): Promise<PaginatedResult<Device>>
   getDevice(id: string): Promise<Device>
   createDevice(dto: CreateDeviceDto): Promise<Device>
@@ -160,4 +165,14 @@ export interface IPublicService {
   distributions(query: PaginationQueryDto): Promise<PaginatedResult<PublicDistributionDto>>
   gallery(query: PublicGalleryQueryDto): Promise<PublicMediaDto[]>
   comments(query: PublicCommentQueryDto): Promise<PaginatedResult<Comment>>
+}
+
+export interface IReportService {
+  summary(query: import('../../dtos/index.js').ReportQueryDto): Promise<import('../../dtos/index.js').ReportSummaryDto>
+}
+
+/** Retroalimentación sensores → bitácora (alertas por lecturas fuera de rango). */
+export interface ISensorAlertService {
+  thresholdsFor(device: Pick<Device, 'thresholds'>): Record<string, import('../../constants/domain.js').MetricThreshold>
+  evaluate(device: Device, readings: import('../repositories/index.js').CreateSensorReadingData[]): Promise<number>
 }

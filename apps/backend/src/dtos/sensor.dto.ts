@@ -12,6 +12,12 @@ import {
   TimestampsDto,
 } from './common.dto.js'
 
+const ThresholdsDto = Type.Record(
+  Type.String(),
+  Type.Object({ min: Type.Optional(Type.Number()), max: Type.Optional(Type.Number()) }, { additionalProperties: false }),
+  { description: 'Rango normal por métrica, p. ej. { "soil_moisture": { "min": 30, "max": 80 } }' },
+)
+
 export const CreateDeviceDto = Type.Object(
   {
     name: Type.String({ minLength: 2, maxLength: 120 }),
@@ -23,6 +29,7 @@ export const CreateDeviceDto = Type.Object(
     cropId: Type.Optional(ObjectId),
     status: Type.Optional(StringEnum(DEVICE_STATUS)),
     metadata: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
+    thresholds: Type.Optional(ThresholdsDto),
   },
   { additionalProperties: false },
 )
@@ -43,6 +50,7 @@ export const DeviceResponseDto = Type.Object({
   status: StringEnum(DEVICE_STATUS),
   lastSeenAt: Type.Optional(DateTime),
   metadata: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
+  thresholds: Type.Optional(ThresholdsDto),
   ...TimestampsDto,
 })
 export const DeviceListResponseDto = Paginated(DeviceResponseDto)
@@ -78,6 +86,7 @@ export const IngestResultDto = Type.Object({
   received: Type.Integer(),
   stored: Type.Integer(),
   skipped: Type.Integer(),
+  alerts: Type.Integer({ description: 'Alertas registradas en la bitácora por lecturas fuera de rango' }),
 })
 export type IngestResultDto = Static<typeof IngestResultDto>
 
@@ -87,4 +96,9 @@ export const ProviderInfoDto = Type.Object({
   configured: Type.Boolean(),
   isDefault: Type.Boolean(),
 })
-export const ProviderListDto = Type.Object({ enabled: Type.Boolean(), providers: Type.Array(ProviderInfoDto) })
+export const ProviderListDto = Type.Object({
+  enabled: Type.Boolean(),
+  alertsEnabled: Type.Boolean(),
+  defaultThresholds: ThresholdsDto,
+  providers: Type.Array(ProviderInfoDto),
+})
