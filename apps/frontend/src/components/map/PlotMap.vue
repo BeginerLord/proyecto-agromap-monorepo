@@ -82,6 +82,8 @@ function renderPicked() {
   const latLng: L.LatLngTuple = [props.picked.lat, props.picked.lng]
   if (pickMarker) pickMarker.setLatLng(latLng)
   else pickMarker = L.marker(latLng, { icon: pinIcon(true) }).addTo(map)
+  // Si el punto llega de fuera de la vista (p. ej. la ubicación del dispositivo), centrar el mapa en él
+  if (!map.getBounds().contains(latLng)) map.setView(latLng, Math.max(map.getZoom(), 16), { animate: false })
 }
 
 onMounted(() => {

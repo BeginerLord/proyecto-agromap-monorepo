@@ -3,6 +3,7 @@ import type {
   CommentStatus,
   CropStatus,
   DeviceStatus,
+  FieldLogSource,
   FieldLogType,
   HarvestQuality,
   PlotStatus,
@@ -20,6 +21,7 @@ import type {
   Media,
   Plot,
   PlotCharacterization,
+  SensorAlertInfo,
   PlotLocation,
   PlotOwner,
   SensorReading,
@@ -90,7 +92,9 @@ export interface CreateFieldLogData {
   type: FieldLogType
   description: string
   photos?: string[]
-  author: string
+  author?: string
+  source?: FieldLogSource
+  sensor?: SensorAlertInfo
 }
 export interface IFieldLogRepository extends IBaseRepository<FieldLog, CreateFieldLogData> {
   findRecent(limit: number): Promise<FieldLog[]>
@@ -148,6 +152,7 @@ export interface CreateDeviceData {
   crop?: string
   status?: DeviceStatus
   metadata?: Record<string, unknown>
+  thresholds?: Record<string, { min?: number; max?: number }>
 }
 export interface UpdateDeviceData extends Partial<CreateDeviceData> {
   lastSeenAt?: Date
@@ -214,4 +219,22 @@ export interface UpdateCommentData {
 export interface ICommentRepository extends IBaseRepository<Comment, CreateCommentData, UpdateCommentData> {
   approvedCountByDistribution(distributionIds: string[]): Promise<Map<string, number>>
   countByStatus(): Promise<Partial<Record<CommentStatus, number>>>
+}
+
+// ─── Estadísticas y reportes (solo lectura) ──────────────
+export interface ReportRange {
+  from: Date
+  to: Date
+}
+type ReportRows<K extends keyof import('../../dtos/index.js').ReportSummaryDto> =
+  import('../../dtos/index.js').ReportSummaryDto[K]
+export interface IReportRepository {
+  harvestByMonth(range: ReportRange): Promise<ReportRows<'harvestByMonth'>>
+  distributionByMonth(range: ReportRange): Promise<ReportRows<'distributionByMonth'>>
+  harvestBySpecies(range: ReportRange): Promise<ReportRows<'harvestBySpecies'>>
+  distributedBySpecies(range: ReportRange): Promise<ReportRows<'distributedBySpecies'>>
+  cropsByStatus(): Promise<ReportRows<'cropsByStatus'>>
+  fieldLogsByType(range: ReportRange): Promise<ReportRows<'fieldLogsByType'>>
+  plots(range: ReportRange): Promise<ReportRows<'plots'>>
+  countFieldLogs(range: ReportRange): Promise<number>
 }

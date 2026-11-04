@@ -36,6 +36,7 @@ export const FIELD_LOG_TYPES: Record<FieldLogType, { label: string; tone: Tone }
   weeding: { label: 'Deshierbe', tone: 'soil' },
   observation: { label: 'Observación', tone: 'neutral' },
   harvest: { label: 'Cosecha', tone: 'sun' },
+  sensor_alert: { label: 'Alerta de sensor', tone: 'clay' },
   other: { label: 'Otro', tone: 'neutral' },
 }
 

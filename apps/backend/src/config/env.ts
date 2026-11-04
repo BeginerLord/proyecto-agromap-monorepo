@@ -43,6 +43,11 @@ export const env = Object.freeze({
     .split(',')
     .map((origin) => origin.trim()),
 
+  auth: {
+    /** Modo temporal: el panel funciona sin login (se usa el administrador principal). */
+    bypass: toBoolean('AUTH_BYPASS', false),
+  },
+
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET'),
     refreshSecret: required('JWT_REFRESH_SECRET'),
@@ -71,6 +76,8 @@ export const env = Object.freeze({
     enabled: toBoolean('SENSORS_ENABLED', true),
     defaultProvider: optional('SENSOR_DEFAULT_PROVIDER', 'mock'),
     ingestKey: optional('SENSOR_INGEST_KEY', ''),
+    alertsEnabled: toBoolean('SENSOR_ALERTS_ENABLED', true),
+    alertCooldownHours: toNumber('SENSOR_ALERT_COOLDOWN_HOURS', 6),
     http: {
       baseUrl: optional('SENSOR_HTTP_BASE_URL', ''),
       token: optional('SENSOR_HTTP_TOKEN', ''),

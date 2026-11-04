@@ -73,6 +73,13 @@ nginx sirve el build de Vue y hace de proxy de `/api`, `/uploads` y `/docs` haci
 cookies de sesión son del mismo origen. Los datos de Mongo y las fotos subidas persisten en los volúmenes
 `mongo-data` y `uploads` (`docker compose down -v` los borra).
 
+### Acceso al panel sin login (temporal)
+
+Mientras `AUTH_BYPASS=true` (`apps/backend/.env`) y `VITE_AUTH_BYPASS=true` (`apps/frontend/.env` y el
+`build.args` del frontend en `docker-compose.yml`), el panel funciona **sin iniciar sesión**: la API
+atiende cada petición como el primer administrador activo y todo lo que se registre queda a su nombre.
+Para volver a exigir login, pon ambas variables en `false` y reconstruye (`docker compose up -d --build`).
+
 ## Scripts (raíz)
 
 | Script | Descripción |
@@ -112,7 +119,9 @@ sesión se invalidan los anteriores (`tokenVersion`). El frontend nunca lee ni g
 **Roles:** `admin`, `agronomist`, `farmer`, `student`.
 
 **Módulos:** auth, usuarios, dashboard, predios, cultivos, bitácora, cosechas, jornadas de apoyo,
-evidencias (fotos), experiencias (comentarios con moderación), sitio público y sensores.
+evidencias (fotos), experiencias (comentarios con moderación), estadísticas y reportes
+(`GET /reports/summary`: producción y entregas por mes y especie, cultivos, bitácora y predios; exportable
+a CSV o PDF desde `/panel/reports`), sitio público y sensores.
 
 ### Sitio público y evidencias
 
@@ -131,6 +140,15 @@ Los dispositivos aún no están definidos, así que la integración vive en
 [`apps/backend/src/adapters/sensors`](apps/backend/src/adapters/sensors/README.md): un contrato
 `ISensorAdapter`, un simulador (`mock`), una plantilla REST (`http`) y un esqueleto para nuevos
 proveedores. Para conectar el hardware real basta con escribir un adapter y registrarlo.
+
+### Sensores → bitácora (alertas automáticas)
+
+Cada lectura que llega (sincronización o ingesta) se compara con el rango normal de su métrica
+(`DEFAULT_SENSOR_THRESHOLDS` en `src/constants/domain.ts`, sobrescribible por dispositivo con el campo
+`thresholds`). Si la lectura más reciente sale del rango, `SensorAlertService` crea un registro
+**«Alerta de sensor»** en la bitácora del cultivo del dispositivo (o del cultivo activo más reciente de su
+predio), con origen `sensor` y sin autor humano. La misma alerta no se repite durante
+`SENSOR_ALERT_COOLDOWN_HOURS` (6 h por defecto); `SENSOR_ALERTS_ENABLED=false` la desactiva.
 
 ## Frontend (`apps/frontend`)
 

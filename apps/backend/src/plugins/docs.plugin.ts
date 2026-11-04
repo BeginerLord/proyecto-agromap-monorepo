@@ -35,6 +35,7 @@ export const docsPlugin = fp(async (app: FastifyInstance) => {
         { name: 'Bitácora', description: 'Registros de campo por cultivo' },
         { name: 'Cosechas' },
         { name: 'Jornadas de apoyo', description: 'Entregas de alimentos a estudiantes' },
+        { name: 'Estadísticas y reportes', description: 'Indicadores agregados por periodo' },
         { name: 'Evidencias', description: 'Fotos de predios, cultivos y jornadas' },
         { name: 'Experiencias', description: 'Moderación de comentarios del sitio público' },
         { name: 'Sensores (adapter)', description: 'Integración desacoplada con dispositivos IoT' },

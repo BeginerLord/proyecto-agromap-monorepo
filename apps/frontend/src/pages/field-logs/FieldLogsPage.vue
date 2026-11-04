@@ -6,7 +6,7 @@ import { BaseButton, BaseCard, BasePagination, BaseSelect, EmptyState, PageHeade
 import { useAsyncAction } from '@/composables/useAsyncAction'
 import { usePaginatedList } from '@/composables/usePaginatedList'
 import { FIELD_LOG_TYPES, ROLES, toOptions } from '@/constants'
-import type { Crop, FieldLog, FieldLogQuery, FieldLogType } from '@/models'
+import type { Crop, FieldLog, FieldLogQuery, FieldLogSource, FieldLogType } from '@/models'
 import { cropService, fieldLogService } from '@/services'
 import { useAuthStore } from '@/stores/auth.store'
 
@@ -16,11 +16,16 @@ const formOpen = ref(false)
 const { run } = useAsyncAction()
 
 const { items, meta, loading, filters, page, load } = usePaginatedList<FieldLog, FieldLogQuery>(
-  (query) => fieldLogService.list({ ...query, type: query.type || undefined }),
-  { search: '', type: '' as FieldLogType },
+  (query) => fieldLogService.list({ ...query, type: query.type || undefined, source: query.source || undefined }),
+  { search: '', type: '' as FieldLogType, source: '' as FieldLogSource },
 )
 
-const canRemove = (log: FieldLog) => log.author.id === auth.user?.id || auth.hasRole([ROLES.ADMIN])
+const canRemove = (log: FieldLog) =>
+  (!!log.author && log.author.id === auth.user?.id) || auth.hasRole([ROLES.ADMIN])
+const sourceOptions = [
+  { value: 'manual', label: 'Registradas por el equipo' },
+  { value: 'sensor', label: 'Alertas de sensores' },
+]
 
 async function remove(log: FieldLog) {
   if (!confirm('¿Eliminar este registro?')) return
@@ -39,7 +44,7 @@ onMounted(async () => {
     <PageHeader
       eyebrow="Fase III · Seguimiento"
       title="Bitácora de campo"
-      description="Riegos, fertilizaciones, controles fitosanitarios y observaciones de cada cultivo."
+      description="Riegos, fertilizaciones, controles fitosanitarios y observaciones de cada cultivo. Las lecturas de sensores fuera de rango se registran aquí automáticamente."
     >
       <template #actions>
         <BaseButton icon="plus" @click="formOpen = true">Nuevo registro</BaseButton>
@@ -50,6 +55,7 @@ onMounted(async () => {
       <div class="filters">
         <SearchInput v-model="filters.search" placeholder="Buscar en descripciones" />
         <BaseSelect v-model="filters.type" :options="toOptions(FIELD_LOG_TYPES)" placeholder="Todas las actividades" />
+        <BaseSelect v-model="filters.source" :options="sourceOptions" placeholder="Todos los orígenes" />
       </div>
       <EmptyState v-if="!loading && !items.length" icon="notebook" title="Sin registros" description="Agrega la primera actividad de campo." />
       <FieldLogList v-else :logs="items" :removable="canRemove" @remove="remove" />
@@ -63,7 +69,7 @@ onMounted(async () => {
 <style scoped>
 .filters {
   display: grid;
-  grid-template-columns: minmax(240px, 1.5fr) minmax(200px, 1fr);
+  grid-template-columns: minmax(240px, 1.5fr) repeat(2, minmax(180px, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-6);
 }

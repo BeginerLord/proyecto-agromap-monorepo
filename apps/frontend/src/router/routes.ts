@@ -90,6 +90,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/distributions/DistributionsPage.vue'),
         meta: { title: 'Jornadas de apoyo' },
       },
+      {
+        path: 'reports',
+        name: ROUTE_NAMES.REPORTS,
+        component: () => import('@/pages/reports/ReportsPage.vue'),
+        meta: { title: 'Estadísticas y reportes' },
+      },
       { path: 'sensors', name: ROUTE_NAMES.SENSORS, component: () => import('@/pages/sensors/SensorsPage.vue'), meta: { title: 'Sensores' } },
       {
         path: 'comments',

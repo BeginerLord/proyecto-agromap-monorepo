@@ -27,7 +27,11 @@ const emit = defineEmits<{ remove: [log: FieldLog] }>()
       </div>
       <p>{{ log.description }}</p>
       <span class="faint">
-        {{ log.crop.species }} · {{ log.plot.name }} · por {{ log.author.name }}
+        {{ log.crop.species }} · {{ log.plot.name }} ·
+        <template v-if="log.source === 'sensor'">
+          <BaseIcon name="sensor" :size="13" class="log__sensor" /> {{ log.sensor?.deviceName ?? 'Sensor' }}
+        </template>
+        <template v-else>por {{ log.author?.name ?? '—' }}</template>
       </span>
     </li>
   </ul>
@@ -69,6 +73,9 @@ const emit = defineEmits<{ remove: [log: FieldLog] }>()
 }
 .log__remove:hover {
   color: var(--clay-500);
+}
+.log__sensor {
+  vertical-align: -2px;
 }
 .log p {
   font-size: var(--text-sm);

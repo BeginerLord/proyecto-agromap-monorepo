@@ -14,3 +14,6 @@ export const MAP_DEFAULTS = {
 }
 
 export const PAGE_SIZE = 12
+
+/** Modo temporal sin login: debe coincidir con AUTH_BYPASS del backend. */
+export const AUTH_BYPASS = import.meta.env.VITE_AUTH_BYPASS === 'true'

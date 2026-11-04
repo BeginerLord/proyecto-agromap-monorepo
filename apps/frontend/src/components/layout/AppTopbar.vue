@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import BaseIcon from '@/components/ui/BaseIcon.vue'
-import { ROLE_LABELS, ROUTE_NAMES } from '@/constants'
+import { AUTH_BYPASS, ROLE_LABELS, ROUTE_NAMES } from '@/constants'
 import { useAuthStore } from '@/stores/auth.store'
 import { initials } from '@/utils/format'
 
@@ -29,7 +29,7 @@ async function logout() {
         <strong>{{ auth.user.name }}</strong>
         <small>{{ ROLE_LABELS[auth.user.role] }}</small>
       </span>
-      <button class="user__logout" type="button" title="Cerrar sesión" aria-label="Cerrar sesión" @click="logout">
+      <button v-if="!AUTH_BYPASS" class="user__logout" type="button" title="Cerrar sesión" aria-label="Cerrar sesión" @click="logout">
         <BaseIcon name="logout" />
       </button>
     </div>

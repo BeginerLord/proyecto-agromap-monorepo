@@ -10,6 +10,7 @@ import { harvestRoutes } from './harvest.routes.js'
 import { mediaRoutes } from './media.routes.js'
 import { plotRoutes } from './plot.routes.js'
 import { publicRoutes } from './public.routes.js'
+import { reportRoutes } from './report.routes.js'
 import { sensorRoutes } from './sensor.routes.js'
 import { userRoutes } from './user.routes.js'
 
@@ -36,4 +37,5 @@ export const apiRoutes: FastifyPluginAsyncTypebox = async (app) => {
   await app.register(mediaRoutes, { prefix: '/media' })
   await app.register(commentRoutes, { prefix: '/comments' })
   await app.register(publicRoutes, { prefix: '/public' })
+  await app.register(reportRoutes, { prefix: '/reports' })
 }

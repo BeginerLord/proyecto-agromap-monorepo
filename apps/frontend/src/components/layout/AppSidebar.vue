@@ -35,6 +35,11 @@ const sections: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: 'Análisis',
+    items: [{ to: ROUTE_NAMES.REPORTS, label: 'Estadísticas y reportes', icon: 'chart' },
+    ],
+  },
+  {
     title: 'Sistema',
     items: [
       { to: ROUTE_NAMES.SENSORS, label: 'Sensores', icon: 'sensor' },
