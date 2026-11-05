@@ -13,7 +13,7 @@ Monorepo administrado con **pnpm workspaces**:
 proyecto/
 ├── apps/
 │   ├── backend/     API REST · Fastify 5 + TypeScript + MongoDB (Mongoose) + Scalar
-│   └── frontend/    SPA · Vue 3 + Vite + TypeScript + Pinia + Leaflet
+│   └── frontend/    SPA · Vue 3 + Vite + TypeScript + Pinia + Mapbox GL JS
 └── docs/            Modelado de datos y mockup (.docx), diagrama ER y capturas
 ```
 
@@ -130,9 +130,36 @@ a CSV o PDF desde `/panel/reports`), sitio público y sensores.
 - `POST /api/v1/public/comments` recibe experiencias de la comunidad: quedan *pendientes* hasta que un
   administrador o agrónomo las apruebe (`/panel/comments`). Tiene límite de envíos y un campo trampa anti-bots.
 - `POST /api/v1/media` sube fotos (JPG/PNG/WEBP, máx. `UPLOAD_MAX_MB`) asociadas a un predio, cultivo o
-  jornada. El tipo se valida por los bytes del archivo, no por la extensión. El almacenamiento usa el
-  adapter `IFileStorage` (`src/adapters/storage`): hoy disco local en `/uploads`, intercambiable por S3 o
-  Cloudinary.
+  jornada. El tipo se valida por los bytes del archivo, no por la extensión.
+
+### Imágenes: Backblaze B2 + WebP
+
+- **Conversión:** toda foto subida se guarda como **WebP** (`sharp`): respeta la orientación del celular,
+  elimina metadatos (incluida la ubicación GPS) y reduce a `IMAGE_MAX_DIMENSION` px el lado mayor con
+  calidad `IMAGE_WEBP_QUALITY` (82). Una foto de celular de varios MB suele quedar en 100–400 KB.
+  Los mapas estáticos de Mapbox también se guardan en WebP.
+- **Almacenamiento:** adapter `IFileStorage` (`src/adapters/storage`) con dos implementaciones:
+  `S3FileStorage` (Backblaze B2 o cualquier S3 compatible) y `LocalFileStorage` (carpeta `uploads`).
+  `STORAGE_DRIVER=s3` usa B2; si faltan las claves, la API usa disco local y lo avisa en el log.
+- **Configuración** en `apps/backend/.env`:
+
+  ```env
+  STORAGE_DRIVER=s3
+  S3_ENDPOINT=https://s3.us-east-005.backblazeb2.com   # B2 → Buckets → Endpoint
+  S3_BUCKET=nombre-del-bucket
+  S3_ACCESS_KEY_ID=keyID                               # B2 → Application Keys
+  S3_SECRET_ACCESS_KEY=applicationKey
+  S3_KEY_PREFIX=agromap                                # carpeta dentro del bucket (opcional)
+  S3_PUBLIC_URL=                                       # solo si el bucket es público
+  ```
+
+- **Cómo se sirven:** con bucket **privado** (recomendado) las URLs son `/uploads/<clave>` y la API lee el
+  objeto de B2; nginx guarda una copia 30 días (`X-Cache-Status`) y el navegador la cachea como inmutable,
+  así que B2 recibe una sola descarga por imagen. Con bucket público y `S3_PUBLIC_URL`, las URLs apuntan
+  directo a B2.
+- **Imágenes que ya estaban en disco:** se siguen mostrando y se pueden pasar a B2 (convirtiéndolas a WebP)
+  con `pnpm --filter @agromap/backend storage-migrate`
+  (Docker: `docker compose exec backend node dist/scripts/storage-migrate.js`).
 
 ### Sensores (patrón Adapter)
 
@@ -149,6 +176,31 @@ Cada lectura que llega (sincronización o ingesta) se compara con el rango norma
 **«Alerta de sensor»** en la bitácora del cultivo del dispositivo (o del cultivo activo más reciente de su
 predio), con origen `sensor` y sin autor humano. La misma alerta no se repite durante
 `SENSOR_ALERT_COOLDOWN_HOURS` (6 h por defecto); `SENSOR_ALERTS_ENABLED=false` la desactiva.
+
+### Mapas (Mapbox) y ahorro de consumo
+
+El token se configura **solo** en `apps/backend/.env`:
+
+```env
+MAPBOX_ACCESS_TOKEN=pk.tu_token_publico
+MAPBOX_STYLE=mapbox/outdoors-v12
+MAPBOX_SNAPSHOTS=true
+```
+
+- **Mapa estático guardado:** al registrar un predio (o al cambiar su ubicación), `MapSnapshotService`
+  pide **una sola vez** una imagen a la [Static Images API](https://docs.mapbox.com/api/maps/static-images/)
+  y la guarda en el almacenamiento de imágenes (B2 o `/uploads`, campo `mapSnapshot` del predio). El detalle del predio (panel y sitio público)
+  y las tarjetas sin fotos muestran esa imagen, así que verlos no vuelve a consumir Mapbox. Si la
+  ubicación no cambia, no se genera otra.
+- **Mapa interactivo:** el tablero, el listado y el formulario (selección de ubicación) usan Mapbox GL JS,
+  que se factura por carga de mapa. El navegador obtiene el token desde `GET /api/v1/public/map-config`,
+  por eso no hace falta reconstruir el frontend al cambiarlo.
+- **Predios existentes:** genera sus mapas estáticos con
+  `pnpm --filter @agromap/backend map-snapshots` (Docker: `docker compose exec backend node dist/scripts/map-snapshots.js`).
+- Sin token, la API funciona igual y el mapa muestra un aviso.
+
+Recomendado: restringe el token por URL en tu cuenta de Mapbox y revisa sus términos sobre el
+almacenamiento de imágenes estáticas.
 
 ## Frontend (`apps/frontend`)
 

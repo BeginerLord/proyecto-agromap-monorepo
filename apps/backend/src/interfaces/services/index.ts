@@ -176,3 +176,10 @@ export interface ISensorAlertService {
   thresholdsFor(device: Pick<Device, 'thresholds'>): Record<string, import('../../constants/domain.js').MetricThreshold>
   evaluate(device: Device, readings: import('../repositories/index.js').CreateSensorReadingData[]): Promise<number>
 }
+
+/** Imagen estática del predio (una petición a Mapbox por ubicación). */
+export interface IMapSnapshotService {
+  isEnabled(): boolean
+  ensure(plot: Plot): Promise<Plot>
+  remove(plot: Plot): Promise<void>
+}

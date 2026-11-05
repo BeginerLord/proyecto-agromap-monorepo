@@ -2,6 +2,7 @@ import type {
   Comment,
   CommentPayload,
   CommentQuery,
+  MapConfig,
   Media,
   MediaOwner,
   Paginated,
@@ -18,6 +19,7 @@ import { cleanParams, http, request } from './http'
 
 /** Endpoints abiertos (sin sesión). */
 export const publicApi = {
+  mapConfig: () => request.get<MapConfig>('/public/map-config'),
   overview: () => request.get<PublicOverview>('/public/overview'),
   plots: () => request.get<{ data: PublicPlot[] }>('/public/plots'),
   plot: (id: string) => request.get<PublicPlotDetail>(`/public/plots/${id}`),

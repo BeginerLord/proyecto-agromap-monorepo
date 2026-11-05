@@ -9,15 +9,17 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "map-snapshots": "tsx src/scripts/map-snapshots.ts",
+    "storage-migrate": "tsx src/scripts/storage-migrate.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1162.0",
     "@fastify/cookie": "^11.1.3",
     "@fastify/cors": "^11.3.1",
     "@fastify/helmet": "^13.2.0",
     "@fastify/multipart": "^10.1.4",
     "@fastify/rate-limit": "^11.2.1",
-    "@fastify/static": "^10.1.6",
     "@fastify/swagger": "^9.9.2",
     "@fastify/type-provider-typebox": "^6.3.0",
     "@scalar/fastify-api-reference": "^1.75.0",
@@ -26,6 +28,7 @@
     "fastify": "^5.12.7",
     "fastify-plugin": "^6.0.1",
     "mongoose": "^9.11.2",
+    "sharp": "^0.35.5",
     "typebox": "^1.4.0"
   },
   "devDependencies": {

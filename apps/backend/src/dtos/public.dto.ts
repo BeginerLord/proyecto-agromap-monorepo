@@ -39,6 +39,8 @@ export const PublicPlotDto = Type.Object({
     sunExposure: Type.Optional(StringEnum(SUN_EXPOSURE)),
   }),
   coverUrl: Type.Optional(Type.String()),
+  /** Mapa estático guardado del predio (sin petición a Mapbox). */
+  mapUrl: Type.Optional(Type.String()),
   photoCount: Type.Integer(),
   crops: Type.Array(PublicCropDto),
 })
@@ -96,3 +98,9 @@ export const PublicCommentQueryDto = Type.Object({
   distributionId: Type.Optional(ObjectId),
 })
 export type PublicCommentQueryDto = Static<typeof PublicCommentQueryDto>
+
+export const MapConfigDto = Type.Object({
+  enabled: Type.Boolean(),
+  accessToken: Type.Optional(Type.String({ description: 'Token público de Mapbox (pk.*)' })),
+  style: Type.String({ description: 'URL del estilo para Mapbox GL JS' }),
+})

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef } from 'vue'
 import CropProgress from '@/components/crops/CropProgress.vue'
-import PlotMap from '@/components/map/PlotMap.vue'
+import StaticPlotMap from '@/components/map/StaticPlotMap.vue'
 import CommentList from '@/components/public/CommentList.vue'
 import PhotoGallery from '@/components/public/PhotoGallery.vue'
 import { BaseBadge, EmptyState, PageHeader } from '@/components/ui'
@@ -54,7 +54,7 @@ const asCrop = (crop: PublicPlotDetail['crops'][number]) => crop as unknown as C
     <PageHeader :eyebrow="`${plot.location.municipality} · ${plot.location.district}`" :title="plot.name" />
 
     <div class="detail__top">
-      <PlotMap :plots="[plot]" :selected-id="plot.id" height="320px" />
+      <StaticPlotMap :plot="plot" :snapshot-url="plot.mapUrl" height="320px" />
       <dl class="facts">
         <div v-for="fact in facts" :key="fact.label">
           <dt class="faint">{{ fact.label }}</dt>

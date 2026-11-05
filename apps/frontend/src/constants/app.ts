@@ -9,8 +9,6 @@ export const MAP_DEFAULTS = {
     Number(import.meta.env.VITE_MAP_CENTER_LNG ?? -75.7917),
   ] as [number, number],
   zoom: Number(import.meta.env.VITE_MAP_ZOOM ?? 12),
-  tiles: import.meta.env.VITE_MAP_TILES_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }
 
 export const PAGE_SIZE = 12

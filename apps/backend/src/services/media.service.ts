@@ -1,4 +1,5 @@
 import type { IFileStorage } from '../adapters/storage/index.js'
+import { env } from '../config/env.js'
 import { ROLE_GROUPS } from '../constants/roles.js'
 import type { MediaQueryDto, UpdateMediaDto, UploadMediaFields } from '../dtos/index.js'
 import { BadRequestException, ForbiddenException, NotFoundException } from '../exceptions/index.js'
@@ -12,7 +13,7 @@ import type {
   IPlotRepository,
 } from '../interfaces/repositories/index.js'
 import type { IMediaService, UploadedFile } from '../interfaces/services/index.js'
-import { compact, detectImage, resolvePagination, toDate, toPaginated } from '../utils/index.js'
+import { compact, detectImage, resolvePagination, toDate, toPaginated, toWebp } from '../utils/index.js'
 
 const OBJECT_ID = /^[a-fA-F0-9]{24}$/
 
@@ -44,13 +45,25 @@ export class MediaService implements IMediaService {
       throw new BadRequestException('Asocia la foto a un predio, un cultivo o una jornada')
     }
 
-    const stored = await this.storage.save(file.buffer, image.extension)
+    // Toda foto se guarda como WebP: menos peso para el bucket y carga más rápida en el sitio
+    const optimized = await toWebp(file.buffer, {
+      maxDimension: env.images.maxDimension,
+      quality: env.images.webpQuality,
+    }).catch(() => {
+      throw new BadRequestException('La imagen está dañada o no se pudo procesar')
+    })
+
+    const stored = await this.storage.save({
+      content: optimized.buffer,
+      extension: optimized.extension,
+      contentType: optimized.mimeType,
+    })
     try {
       return await this.media.create({
         url: stored.url,
         storageKey: stored.key,
-        mimeType: image.mimeType,
-        size: file.buffer.length,
+        mimeType: optimized.mimeType,
+        size: optimized.buffer.length,
         caption: fields.caption?.trim().slice(0, 200) || undefined,
         takenAt: toDate(fields.takenAt),
         isPublic: fields.isPublic ?? true,

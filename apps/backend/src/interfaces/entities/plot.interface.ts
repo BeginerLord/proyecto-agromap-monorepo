@@ -35,6 +35,16 @@ export interface PlotCharacterization {
   notes?: string
 }
 
+/** Imagen estática del predio generada una vez con Mapbox y guardada en el almacenamiento propio. */
+export interface PlotMapSnapshot {
+  url: string
+  storageKey: string
+  lng: number
+  lat: number
+  style: string
+  generatedAt: Date
+}
+
 export interface Plot {
   id: string
   name: string
@@ -44,6 +54,7 @@ export interface Plot {
   areaM2?: number
   characterization: PlotCharacterization
   status: PlotStatus
+  mapSnapshot?: PlotMapSnapshot
   createdBy?: UserRef
   createdAt: Date
   updatedAt: Date

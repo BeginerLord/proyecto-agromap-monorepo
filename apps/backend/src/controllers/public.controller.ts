@@ -1,4 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import { env } from '../config/env.js'
 import type {
   CreatePublicCommentDto,
   IdParamDto,
@@ -14,6 +15,13 @@ export class PublicController {
     private readonly publicService: IPublicService,
     private readonly commentService: ICommentService,
   ) {}
+
+  /** Configuración del mapa para el navegador (el token de Mapbox es público por diseño). */
+  mapConfig = () => ({
+    enabled: Boolean(env.mapbox.accessToken),
+    accessToken: env.mapbox.accessToken || undefined,
+    style: `mapbox://styles/${env.mapbox.style}`,
+  })
 
   overview = () => this.publicService.overview()
 

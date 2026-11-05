@@ -29,6 +29,8 @@ export interface PublicPlot {
   areaM2?: number
   characterization: { soilType?: string; waterAccess?: WaterAccess; sunExposure?: SunExposure }
   coverUrl?: string
+  /** Mapa estático guardado del predio (sirve de portada si no hay fotos). */
+  mapUrl?: string
   photoCount: number
   crops: PublicCrop[]
 }
@@ -119,4 +121,11 @@ export interface MediaOwner {
   plotId?: string
   cropId?: string
   distributionId?: string
+}
+
+/** Configuración pública del mapa (GET /public/map-config). */
+export interface MapConfig {
+  enabled: boolean
+  accessToken?: string
+  style: string
 }
