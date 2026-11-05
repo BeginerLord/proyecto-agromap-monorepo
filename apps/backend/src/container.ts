@@ -3,35 +3,51 @@
  * Es el único lugar que conoce las implementaciones concretas (inyección de dependencias manual).
  */
 import { createDefaultRegistry } from './adapters/sensors/index.js'
+import { MapboxStaticMapAdapter } from './adapters/maps/index.js'
+import { createFileStorage } from './adapters/storage/index.js'
+import { env } from './config/env.js'
 import {
   AuthController,
+  CommentController,
   CropController,
   DashboardController,
   DistributionController,
   FieldLogController,
   HarvestController,
+  MediaController,
   PlotController,
+  PublicController,
+  ReportController,
   SensorController,
   UserController,
 } from './controllers/index.js'
 import {
+  CommentRepository,
   CropRepository,
   DeviceRepository,
   DistributionRepository,
   FieldLogRepository,
   HarvestRepository,
+  MediaRepository,
   PlotRepository,
+  ReportRepository,
   SensorReadingRepository,
   UserRepository,
 } from './repositories/index.js'
 import {
   AuthService,
+  CommentService,
   CropService,
   DashboardService,
   DistributionService,
   FieldLogService,
   HarvestService,
+  MapSnapshotService,
+  MediaService,
   PlotService,
+  PublicService,
+  ReportService,
+  SensorAlertService,
   SensorService,
   UserService,
 } from './services/index.js'
@@ -39,6 +55,8 @@ import { BcryptPasswordHasher, tokenService } from './utils/index.js'
 
 // Adapters
 export const sensorRegistry = createDefaultRegistry()
+/** Backblaze B2 (S3) o disco local según STORAGE_DRIVER; se usa también para servir /uploads. */
+export const fileStorage = createFileStorage()
 
 // Repositorios
 const repositories = {
@@ -50,13 +68,24 @@ const repositories = {
   distributions: new DistributionRepository(),
   devices: new DeviceRepository(),
   readings: new SensorReadingRepository(),
+  media: new MediaRepository(),
+  comments: new CommentRepository(),
+  reports: new ReportRepository(),
 }
 
 // Servicios
 const services = {
   auth: new AuthService(repositories.users, new BcryptPasswordHasher(), tokenService),
   users: new UserService(repositories.users),
-  plots: new PlotService(repositories.plots, repositories.crops),
+  plots: new PlotService(
+    repositories.plots,
+    repositories.crops,
+    new MapSnapshotService(
+      new MapboxStaticMapAdapter({ accessToken: env.mapbox.accessToken, style: env.mapbox.style }),
+      fileStorage,
+      repositories.plots,
+    ),
+  ),
   crops: new CropService(repositories.crops, repositories.plots, repositories.harvests),
   fieldLogs: new FieldLogService(repositories.fieldLogs, repositories.crops),
   harvests: new HarvestService(repositories.harvests, repositories.crops),
@@ -74,6 +103,24 @@ const services = {
     repositories.readings,
     repositories.plots,
     repositories.crops,
+    new SensorAlertService(repositories.fieldLogs, repositories.crops),
+  ),
+  media: new MediaService(
+    repositories.media,
+    fileStorage,
+    repositories.plots,
+    repositories.crops,
+    repositories.distributions,
+  ),
+  reports: new ReportService(repositories.reports),
+  comments: new CommentService(repositories.comments, repositories.plots, repositories.distributions),
+  public: new PublicService(
+    repositories.plots,
+    repositories.crops,
+    repositories.harvests,
+    repositories.distributions,
+    repositories.media,
+    repositories.comments,
   ),
 }
 
@@ -88,6 +135,10 @@ export const controllers = {
   distributions: new DistributionController(services.distributions),
   dashboard: new DashboardController(services.dashboard),
   sensors: new SensorController(services.sensors),
+  media: new MediaController(services.media),
+  comments: new CommentController(services.comments),
+  public: new PublicController(services.public, services.comments),
+  reports: new ReportController(services.reports),
 }
 
 export type Controllers = typeof controllers

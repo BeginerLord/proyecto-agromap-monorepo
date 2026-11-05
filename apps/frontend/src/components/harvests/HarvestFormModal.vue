@@ -52,7 +52,7 @@ async function submit() {
 </script>
 
 <template>
-  <BaseModal v-model:open="open" title="Registrar cosecha" description="Los kilos quedarán disponibles para las jornadas sabatinas.">
+  <BaseModal v-model:open="open" title="Registrar cosecha" description="Los kilos quedarán disponibles para las jornadas de apoyo.">
     <form id="harvest-form" class="stack" @submit.prevent="submit">
       <BaseSelect v-model="form.cropId" label="Cultivo" :options="cropOptions" placeholder="Selecciona…" required />
       <div class="grid grid--2">

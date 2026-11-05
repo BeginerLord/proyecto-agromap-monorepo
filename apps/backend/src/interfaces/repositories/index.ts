@@ -1,6 +1,16 @@
-import type { CropStatus, DeviceStatus, FieldLogType, HarvestQuality, PlotStatus } from '../../constants/domain.js'
+import type {
+  CommentAuthorRole,
+  CommentStatus,
+  CropStatus,
+  DeviceStatus,
+  FieldLogSource,
+  FieldLogType,
+  HarvestQuality,
+  PlotStatus,
+} from '../../constants/domain.js'
 import type { Role } from '../../constants/roles.js'
 import type {
+  Comment,
   Crop,
   Device,
   Distribution,
@@ -8,15 +18,18 @@ import type {
   FieldLog,
   GeoPolygon,
   Harvest,
+  Media,
   Plot,
   PlotCharacterization,
+  SensorAlertInfo,
   PlotLocation,
+  PlotMapSnapshot,
   PlotOwner,
   SensorReading,
   User,
   UserWithSecrets,
 } from '../entities/index.js'
-import type { IBaseRepository } from './base-repository.interface.js'
+import type { Filter, IBaseRepository } from './base-repository.interface.js'
 
 export * from './base-repository.interface.js'
 
@@ -50,6 +63,7 @@ export interface CreatePlotData {
   characterization?: PlotCharacterization
   status?: PlotStatus
   createdBy?: string
+  mapSnapshot?: PlotMapSnapshot
 }
 export type IPlotRepository = IBaseRepository<Plot, CreatePlotData>
 
@@ -80,7 +94,9 @@ export interface CreateFieldLogData {
   type: FieldLogType
   description: string
   photos?: string[]
-  author: string
+  author?: string
+  source?: FieldLogSource
+  sensor?: SensorAlertInfo
 }
 export interface IFieldLogRepository extends IBaseRepository<FieldLog, CreateFieldLogData> {
   findRecent(limit: number): Promise<FieldLog[]>
@@ -108,7 +124,7 @@ export interface IHarvestRepository extends IBaseRepository<Harvest, CreateHarve
   releaseKg(id: string, quantityKg: number): Promise<void>
 }
 
-// ─── Distribuciones (jornadas sabatinas) ─────────────────
+// ─── Distribuciones (jornadas de apoyo) ──────────────────
 export interface CreateDistributionData {
   date: Date
   title: string
@@ -138,6 +154,7 @@ export interface CreateDeviceData {
   crop?: string
   status?: DeviceStatus
   metadata?: Record<string, unknown>
+  thresholds?: Record<string, { min?: number; max?: number }>
 }
 export interface UpdateDeviceData extends Partial<CreateDeviceData> {
   lastSeenAt?: Date
@@ -158,4 +175,68 @@ export interface CreateSensorReadingData {
 export interface ISensorReadingRepository
   extends IBaseRepository<SensorReading, CreateSensorReadingData> {
   insertMany(readings: CreateSensorReadingData[]): Promise<number>
+}
+
+// ─── Evidencias (fotos) ──────────────────────────────────
+export interface CreateMediaData {
+  url: string
+  storageKey: string
+  mimeType: string
+  size: number
+  caption?: string
+  plot?: string
+  crop?: string
+  distribution?: string
+  isPublic?: boolean
+  takenAt?: Date
+  uploadedBy: string
+}
+export interface UpdateMediaData {
+  caption?: string
+  isPublic?: boolean
+}
+export interface IMediaRepository extends IBaseRepository<Media, CreateMediaData, UpdateMediaData> {
+  findPublic(filter: Filter, limit: number): Promise<Media[]>
+  /** Cantidad de fotos públicas y la más reciente (portada) por predio. */
+  coversByPlot(plotIds: string[]): Promise<Map<string, { url: string; count: number }>>
+  publicByDistribution(distributionIds: string[]): Promise<Map<string, Media[]>>
+}
+
+// ─── Experiencias (comentarios) ──────────────────────────
+export interface CreateCommentData {
+  authorName: string
+  authorRole: CommentAuthorRole
+  message: string
+  rating?: number
+  plot?: string
+  distribution?: string
+  status?: CommentStatus
+  ipHash?: string
+}
+export interface UpdateCommentData {
+  status?: CommentStatus
+  moderatedBy?: string
+  moderatedAt?: Date
+}
+export interface ICommentRepository extends IBaseRepository<Comment, CreateCommentData, UpdateCommentData> {
+  approvedCountByDistribution(distributionIds: string[]): Promise<Map<string, number>>
+  countByStatus(): Promise<Partial<Record<CommentStatus, number>>>
+}
+
+// ─── Estadísticas y reportes (solo lectura) ──────────────
+export interface ReportRange {
+  from: Date
+  to: Date
+}
+type ReportRows<K extends keyof import('../../dtos/index.js').ReportSummaryDto> =
+  import('../../dtos/index.js').ReportSummaryDto[K]
+export interface IReportRepository {
+  harvestByMonth(range: ReportRange): Promise<ReportRows<'harvestByMonth'>>
+  distributionByMonth(range: ReportRange): Promise<ReportRows<'distributionByMonth'>>
+  harvestBySpecies(range: ReportRange): Promise<ReportRows<'harvestBySpecies'>>
+  distributedBySpecies(range: ReportRange): Promise<ReportRows<'distributedBySpecies'>>
+  cropsByStatus(): Promise<ReportRows<'cropsByStatus'>>
+  fieldLogsByType(range: ReportRange): Promise<ReportRows<'fieldLogsByType'>>
+  plots(range: ReportRange): Promise<ReportRows<'plots'>>
+  countFieldLogs(range: ReportRange): Promise<number>
 }

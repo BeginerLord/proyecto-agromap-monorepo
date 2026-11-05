@@ -28,6 +28,8 @@ const ICONS = {
   menu: 'M4 7h16M4 12h16M4 17h16',
   scale: 'M12 4v16M5 20h14M6 8l-3 6a3 3 0 0 0 6 0zM18 8l-3 6a3 3 0 0 0 6 0zM6 8h12',
   arrow: 'M5 12h14M13 6l6 6-6 6',
+  chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
 } as const
 
 export type IconName = keyof typeof ICONS

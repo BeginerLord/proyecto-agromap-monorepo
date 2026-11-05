@@ -14,10 +14,13 @@ import type {
   Harvest,
   HarvestPayload,
   HarvestQuery,
+  MetricThreshold,
   Paginated,
   PaginationQuery,
   Plot,
   PlotPayload,
+  ReportQuery,
+  ReportSummary,
   PlotQuery,
   ReadingQuery,
   SensorProvider,
@@ -70,7 +73,13 @@ export const distributionsApi = {
 }
 
 export const sensorsApi = {
-  providers: () => request.get<{ enabled: boolean; providers: SensorProvider[] }>('/sensors/providers'),
+  providers: () =>
+    request.get<{
+      enabled: boolean
+      alertsEnabled: boolean
+      defaultThresholds: Record<string, MetricThreshold>
+      providers: SensorProvider[]
+    }>('/sensors/providers'),
   listDevices: (query: PaginationQuery = {}) =>
     request.get<Paginated<Device>>('/sensors/devices', { params: cleanParams(query) }),
   createDevice: (payload: DevicePayload) => request.post<Device>('/sensors/devices', payload),
@@ -83,4 +92,9 @@ export const sensorsApi = {
 export const usersApi = {
   list: (query: UserQuery = {}) => request.get<Paginated<User>>('/users', { params: cleanParams(query) }),
   update: (id: string, payload: UpdateUserPayload) => request.patch<User>(`/users/${id}`, payload),
+}
+
+export const reportsApi = {
+  summary: (query: ReportQuery = {}) =>
+    request.get<ReportSummary>('/reports/summary', { params: cleanParams(query) }),
 }

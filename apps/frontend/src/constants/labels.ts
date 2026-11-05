@@ -1,4 +1,12 @@
-import type { CropStatus, FieldLogType, HarvestQuality, SunExposure, WaterAccess } from '@/models'
+import type {
+  CommentAuthorRole,
+  CommentStatus,
+  CropStatus,
+  FieldLogType,
+  HarvestQuality,
+  SunExposure,
+  WaterAccess,
+} from '@/models'
 import type { Role } from './roles'
 
 /** Tonos de la paleta usados por BaseBadge. */
@@ -28,6 +36,7 @@ export const FIELD_LOG_TYPES: Record<FieldLogType, { label: string; tone: Tone }
   weeding: { label: 'Deshierbe', tone: 'soil' },
   observation: { label: 'Observación', tone: 'neutral' },
   harvest: { label: 'Cosecha', tone: 'sun' },
+  sensor_alert: { label: 'Alerta de sensor', tone: 'clay' },
   other: { label: 'Otro', tone: 'neutral' },
 }
 
@@ -59,6 +68,20 @@ export const METRIC_LABELS: Record<string, string> = {
   light: 'Luminosidad',
   rainfall: 'Precipitación',
   battery: 'Batería',
+}
+
+export const COMMENT_AUTHOR_ROLES: Record<CommentAuthorRole, string> = {
+  student: 'Estudiante',
+  volunteer: 'Voluntario/a',
+  farmer: 'Familia agricultora',
+  teacher: 'Docente',
+  visitor: 'Visitante',
+}
+
+export const COMMENT_STATUS: Record<CommentStatus, { label: string; tone: Tone }> = {
+  pending: { label: 'Pendiente', tone: 'sun' },
+  approved: { label: 'Publicado', tone: 'leaf' },
+  rejected: { label: 'Rechazado', tone: 'clay' },
 }
 
 /** Corregimientos del piloto. */

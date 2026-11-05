@@ -6,7 +6,7 @@ import { ROUTE_NAMES } from '@/constants'
 <template>
   <div class="not-found">
     <EmptyState icon="leaf" title="Esta parcela está vacía" description="La página que buscas no existe o fue movida.">
-      <RouterLink :to="{ name: ROUTE_NAMES.DASHBOARD }">
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }">
         <BaseButton icon="arrow">Volver al inicio</BaseButton>
       </RouterLink>
     </EmptyState>

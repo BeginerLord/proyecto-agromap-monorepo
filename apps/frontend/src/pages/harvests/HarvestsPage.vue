@@ -27,7 +27,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <PageHeader eyebrow="Producción" title="Cosechas" description="Kilos cosechados y disponibles para entregar en las jornadas sabatinas.">
+    <PageHeader eyebrow="Producción" title="Cosechas" description="Kilos cosechados y disponibles para entregar en las jornadas de apoyo.">
       <template #actions>
         <label class="toggle">
           <input v-model="filters.onlyAvailable" type="checkbox" />

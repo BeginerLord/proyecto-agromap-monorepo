@@ -1,6 +1,6 @@
 import Type, { type Static } from 'typebox'
 import { PLOT_STATUS, SUN_EXPOSURE, WATER_ACCESS } from '../constants/domain.js'
-import { Paginated, PaginationQueryDto, StringEnum, TimestampsDto, UserRefDto } from './common.dto.js'
+import { DateTime, Paginated, PaginationQueryDto, StringEnum, TimestampsDto, UserRefDto } from './common.dto.js'
 
 export const GeoPointDto = Type.Object(
   {
@@ -74,6 +74,9 @@ export const PlotResponseDto = Type.Object({
   areaM2: Type.Optional(Type.Number()),
   characterization: CharacterizationDto,
   status: StringEnum(PLOT_STATUS),
+  mapSnapshot: Type.Optional(
+    Type.Object({ url: Type.String(), generatedAt: DateTime }, { description: 'Mapa estático guardado (no consume Mapbox al verlo)' }),
+  ),
   createdBy: Type.Optional(UserRefDto),
   ...TimestampsDto,
 })

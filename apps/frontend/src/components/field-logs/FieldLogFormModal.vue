@@ -19,6 +19,8 @@ watch(open, (value) => {
   if (value) Object.assign(form, { cropId: props.defaultCropId ?? '', type: 'observation', date: today(), description: '' })
 })
 
+const manualTypes = toOptions(FIELD_LOG_TYPES).filter((option) => option.value !== 'sensor_alert')
+
 const cropOptions = computed(() =>
   props.crops.map((crop) => ({ value: crop.id, label: `${cropService.label(crop)} — ${crop.plot.name}` })),
 )
@@ -46,7 +48,7 @@ async function submit() {
     <form id="log-form" class="stack" @submit.prevent="submit">
       <BaseSelect v-model="form.cropId" label="Cultivo" :options="cropOptions" placeholder="Selecciona…" required />
       <div class="grid grid--2">
-        <BaseSelect v-model="form.type" label="Actividad" :options="toOptions(FIELD_LOG_TYPES)" />
+        <BaseSelect v-model="form.type" label="Actividad" :options="manualTypes" />
         <BaseInput v-model="form.date" label="Fecha" type="date" required />
       </div>
       <BaseTextarea

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import PlotMap from '@/components/map/PlotMap.vue'
-import { BaseButton, BaseInput, BaseModal, BaseSelect, BaseTextarea } from '@/components/ui'
+import { BaseButton, BaseIcon, BaseInput, BaseModal, BaseSelect, BaseTextarea } from '@/components/ui'
 import { DISTRICTS, SUN_EXPOSURE, WATER_ACCESS, toOptions } from '@/constants/labels'
 import { useAsyncAction } from '@/composables/useAsyncAction'
+import { useGeolocation } from '@/composables/useGeolocation'
 import type { Plot } from '@/models'
 import { emptyPlotForm, plotService, type PlotForm } from '@/services'
 
@@ -13,9 +14,21 @@ const emit = defineEmits<{ saved: [plot: Plot] }>()
 
 const form = ref<PlotForm>(emptyPlotForm())
 const { pending, fieldErrors, run } = useAsyncAction()
+const geo = useGeolocation()
+
+/** Pide la ubicación del dispositivo y la usa como punto del predio. */
+async function useMyLocation() {
+  const fix = await geo.locate()
+  if (fix) onPick(fix)
+}
 
 watch(open, (value) => {
-  if (value) form.value = props.plot ? plotService.toForm(props.plot) : emptyPlotForm()
+  if (!value) return
+  form.value = props.plot ? plotService.toForm(props.plot) : emptyPlotForm()
+  geo.status.value = 'idle'
+  geo.message.value = null
+  // En un predio nuevo se toma la ubicación automáticamente (el navegador pide permiso)
+  if (!props.plot) void useMyLocation()
 })
 
 const picked = computed(() =>
@@ -68,7 +81,21 @@ const districtOptions = DISTRICTS.map((d) => ({ value: d, label: d }))
       </fieldset>
 
       <fieldset class="form__group">
-        <legend class="eyebrow">Ubicación · haz clic en el mapa</legend>
+        <legend class="eyebrow">Ubicación</legend>
+        <div class="geo">
+          <p class="geo__status" :class="`geo__status--${geo.status.value}`" role="status">
+            <BaseIcon :name="geo.status.value === 'located' ? 'check' : 'pin'" :size="16" />
+            <span v-if="geo.status.value === 'locating'">Obteniendo tu ubicación… acepta el permiso del navegador.</span>
+            <span v-else-if="geo.status.value === 'located' && geo.fix.value">
+              Ubicación tomada del dispositivo (precisión ±{{ geo.fix.value.accuracy }} m). Puedes ajustarla con un clic en el mapa.
+            </span>
+            <span v-else-if="geo.message.value">{{ geo.message.value }}</span>
+            <span v-else>Usa tu ubicación actual o haz clic en el mapa para marcar el predio.</span>
+          </p>
+          <BaseButton size="sm" variant="secondary" icon="pin" :loading="geo.status.value === 'locating'" @click="useMyLocation">
+            Usar mi ubicación
+          </BaseButton>
+        </div>
         <PlotMap pickable :picked="picked" height="260px" @pick="onPick" />
         <div class="grid grid--2">
           <BaseInput v-model="form.lat" label="Latitud" type="number" step="0.000001" required />
@@ -111,5 +138,32 @@ const districtOptions = DISTRICTS.map((d) => ({ value: d, label: d }))
 }
 .form__group legend {
   margin-bottom: var(--space-3);
+}
+.geo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.geo__status {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 240px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+.geo__status :deep(svg) {
+  margin-top: 2px;
+}
+.geo__status--located {
+  color: var(--leaf-800);
+}
+.geo__status--denied,
+.geo__status--error,
+.geo__status--unsupported {
+  color: var(--clay-700);
 }
 </style>

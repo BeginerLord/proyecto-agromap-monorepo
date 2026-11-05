@@ -169,16 +169,32 @@ textarea {
   background: var(--leaf-50);
 }
 
-/* Leaflet: armonizar con la paleta */
-.leaflet-container {
+/* Mapbox GL: armonizar con la paleta */
+.mapboxgl-map {
   font-family: var(--font-body);
-  background: var(--sand);
 }
-/* Teselas desaturadas y cálidas para que el mapa no compita con la paleta */
-.leaflet-tile-pane {
-  filter: saturate(0.45) sepia(0.12) brightness(1.02);
-}
-.leaflet-popup-content-wrapper {
+.mapboxgl-popup-content {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+/* ── Impresión (reportes a PDF) ────────────── */
+@media print {
+  .sidebar,
+  .topbar,
+  .no-print,
+  .toasts {
+    display: none !important;
+  }
+  .shell__main {
+    margin-left: 0 !important;
+  }
+  body {
+    background: #fff;
+  }
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
 }

@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router'
 import CropFormModal from '@/components/crops/CropFormModal.vue'
 import CropProgress from '@/components/crops/CropProgress.vue'
 import FieldLogList from '@/components/field-logs/FieldLogList.vue'
-import PlotMap from '@/components/map/PlotMap.vue'
+import MediaManager from '@/components/media/MediaManager.vue'
+import StaticPlotMap from '@/components/map/StaticPlotMap.vue'
 import PlotFormModal from '@/components/plots/PlotFormModal.vue'
 import { BaseBadge, BaseButton, BaseCard, EmptyState, PageHeader } from '@/components/ui'
 import { useAsyncAction } from '@/composables/useAsyncAction'
@@ -76,7 +77,7 @@ const facts = computed(() => {
 
     <div class="detail">
       <div class="stack">
-        <PlotMap :plots="[plot]" :selected-id="plot.id" height="300px" />
+        <StaticPlotMap :plot="plot" :snapshot-url="plot.mapSnapshot?.url" height="300px" />
         <BaseCard leaf>
           <template #header><h3>Caracterización</h3></template>
           <dl class="facts">
@@ -114,12 +115,25 @@ const facts = computed(() => {
       </div>
     </div>
 
+    <BaseCard class="evidence">
+      <template #header>
+        <div>
+          <h3>Evidencias fotográficas</h3>
+          <p class="faint">Las fotos públicas se muestran en la ficha del predio en el sitio público.</p>
+        </div>
+      </template>
+      <MediaManager :owner="{ plotId: plot.id }" :can-edit="canField" />
+    </BaseCard>
+
     <PlotFormModal v-model:open="editOpen" :plot="plot" @saved="load" />
     <CropFormModal v-model:open="cropOpen" :plots="[plot]" :default-plot-id="plot.id" @saved="load" />
   </div>
 </template>
 
 <style scoped>
+.evidence {
+  margin-top: var(--space-6);
+}
 .back {
   display: inline-block;
   margin-bottom: var(--space-3);

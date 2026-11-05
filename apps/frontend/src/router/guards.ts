@@ -2,20 +2,21 @@ import type { Router } from 'vue-router'
 import { APP_NAME, ROUTE_NAMES } from '@/constants'
 import { useAuthStore } from '@/stores/auth.store'
 
-/** Guards globales: autenticación, roles y título del documento. */
+/** Guards globales: autenticación del panel, roles y título del documento. */
 export function registerGuards(router: Router): void {
   router.beforeEach(async (to) => {
     const auth = useAuthStore()
     await auth.init()
 
-    const guestOnly = to.matched.some((record) => record.meta.guestOnly)
-
-    if (guestOnly) {
+    if (to.matched.some((record) => record.meta.guestOnly)) {
       return auth.isAuthenticated ? { name: ROUTE_NAMES.DASHBOARD } : true
     }
 
+    // El sitio público es libre; solo el panel exige sesión
+    if (!to.matched.some((record) => record.meta.requiresAuth)) return true
+
     if (!auth.isAuthenticated) {
-      return { name: ROUTE_NAMES.LOGIN, query: to.fullPath !== '/' ? { redirect: to.fullPath } : undefined }
+      return { name: ROUTE_NAMES.LOGIN, query: { redirect: to.fullPath } }
     }
 
     const roles = to.meta.roles
