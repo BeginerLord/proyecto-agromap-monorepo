@@ -17,6 +17,8 @@ const activeCrops = computed(() =>
   <RouterLink :to="{ name: ROUTE_NAMES.PUBLIC_PLOT, params: { id: plot.id } }" class="plot-card">
     <div class="plot-card__cover">
       <img v-if="plot.coverUrl" :src="plot.coverUrl" :alt="`Foto del ${plot.name}`" loading="lazy" />
+      <!-- Sin fotos: el mapa estático guardado (no consume Mapbox al mostrarse) -->
+      <img v-else-if="plot.mapUrl" :src="plot.mapUrl" :alt="`Mapa del ${plot.name}`" loading="lazy" />
       <div v-else class="plot-card__placeholder" aria-hidden="true">
         <svg viewBox="0 0 200 120" preserveAspectRatio="none">
           <path d="M0 80 C50 60 90 95 140 72 S190 60 200 66 V120 H0 Z" fill="var(--leaf-300)" />

@@ -3,7 +3,8 @@
  * Es el único lugar que conoce las implementaciones concretas (inyección de dependencias manual).
  */
 import { createDefaultRegistry } from './adapters/sensors/index.js'
-import { LocalFileStorage } from './adapters/storage/index.js'
+import { MapboxStaticMapAdapter } from './adapters/maps/index.js'
+import { createFileStorage } from './adapters/storage/index.js'
 import { env } from './config/env.js'
 import {
   AuthController,
@@ -41,6 +42,7 @@ import {
   DistributionService,
   FieldLogService,
   HarvestService,
+  MapSnapshotService,
   MediaService,
   PlotService,
   PublicService,
@@ -53,7 +55,8 @@ import { BcryptPasswordHasher, tokenService } from './utils/index.js'
 
 // Adapters
 export const sensorRegistry = createDefaultRegistry()
-const fileStorage = new LocalFileStorage(env.uploads.dir, env.uploads.publicPath)
+/** Backblaze B2 (S3) o disco local según STORAGE_DRIVER; se usa también para servir /uploads. */
+export const fileStorage = createFileStorage()
 
 // Repositorios
 const repositories = {
@@ -74,7 +77,15 @@ const repositories = {
 const services = {
   auth: new AuthService(repositories.users, new BcryptPasswordHasher(), tokenService),
   users: new UserService(repositories.users),
-  plots: new PlotService(repositories.plots, repositories.crops),
+  plots: new PlotService(
+    repositories.plots,
+    repositories.crops,
+    new MapSnapshotService(
+      new MapboxStaticMapAdapter({ accessToken: env.mapbox.accessToken, style: env.mapbox.style }),
+      fileStorage,
+      repositories.plots,
+    ),
+  ),
   crops: new CropService(repositories.crops, repositories.plots, repositories.harvests),
   fieldLogs: new FieldLogService(repositories.fieldLogs, repositories.crops),
   harvests: new HarvestService(repositories.harvests, repositories.crops),

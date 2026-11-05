@@ -5,6 +5,7 @@ import {
   CommentSubmittedDto,
   CreatePublicCommentDto,
   IdParamDto,
+  MapConfigDto,
   PaginationQueryDto,
   PublicCommentListDto,
   PublicCommentQueryDto,
@@ -21,6 +22,11 @@ import {
 export const publicRoutes: FastifyPluginAsyncTypebox = async (app) => {
   const ctrl = controllers.public
   const tags = ['Público']
+
+  app.get('/map-config', {
+    schema: { tags, summary: 'Configuración del mapa (Mapbox) para el navegador', response: { 200: MapConfigDto } },
+    handler: ctrl.mapConfig,
+  })
 
   app.get('/overview', {
     schema: { tags, summary: 'Indicadores generales del proyecto', response: { 200: PublicOverviewDto } },

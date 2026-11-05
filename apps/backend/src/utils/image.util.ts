@@ -1,3 +1,5 @@
+import sharp from 'sharp'
+
 export interface DetectedImage {
   mimeType: 'image/jpeg' | 'image/png' | 'image/webp'
   extension: 'jpg' | 'png' | 'webp'
@@ -19,4 +21,35 @@ export function detectImage(buffer: Buffer): DetectedImage | null {
     return { mimeType: 'image/webp', extension: 'webp' }
   }
   return null
+}
+
+export interface WebpOptions {
+  /** Lado mayor máximo; no se amplían imágenes más pequeñas. */
+  maxDimension: number
+  /** Calidad 1-100. */
+  quality: number
+}
+
+export interface OptimizedImage {
+  buffer: Buffer
+  width: number
+  height: number
+  mimeType: 'image/webp'
+  extension: 'webp'
+}
+
+/**
+ * Convierte cualquier JPG/PNG/WEBP a WebP optimizado:
+ * - respeta la orientación EXIF del celular (rotate) y luego descarta los metadatos
+ *   (incluida la ubicación GPS de la foto),
+ * - reduce solo si supera maxDimension,
+ * - smartSubsample conserva mejor los bordes de color (hojas, frutos, texto del mapa).
+ */
+export async function toWebp(input: Buffer, { maxDimension, quality }: WebpOptions): Promise<OptimizedImage> {
+  const { data, info } = await sharp(input, { failOn: 'error' })
+    .rotate()
+    .resize({ width: maxDimension, height: maxDimension, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality, effort: 5, smartSubsample: true })
+    .toBuffer({ resolveWithObject: true })
+  return { buffer: data, width: info.width, height: info.height, mimeType: 'image/webp', extension: 'webp' }
 }

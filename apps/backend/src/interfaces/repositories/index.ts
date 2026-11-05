@@ -23,6 +23,7 @@ import type {
   PlotCharacterization,
   SensorAlertInfo,
   PlotLocation,
+  PlotMapSnapshot,
   PlotOwner,
   SensorReading,
   User,
@@ -62,6 +63,7 @@ export interface CreatePlotData {
   characterization?: PlotCharacterization
   status?: PlotStatus
   createdBy?: string
+  mapSnapshot?: PlotMapSnapshot
 }
 export type IPlotRepository = IBaseRepository<Plot, CreatePlotData>
 

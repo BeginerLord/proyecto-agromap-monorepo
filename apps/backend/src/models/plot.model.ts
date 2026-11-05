@@ -41,6 +41,19 @@ const plotSchema = new Schema(
       notes: { type: String, trim: true },
     },
     status: { type: String, enum: PLOT_STATUS, default: 'active', index: true },
+    mapSnapshot: {
+      type: new Schema(
+        {
+          url: { type: String, required: true },
+          storageKey: { type: String, required: true },
+          lng: { type: Number, required: true },
+          lat: { type: Number, required: true },
+          style: { type: String, required: true },
+          generatedAt: { type: Date, required: true },
+        },
+        { _id: false },
+      ),
+    },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true, collection: 'plots', minimize: false },

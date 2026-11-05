@@ -149,6 +149,7 @@ export class PublicService implements IPublicService {
       areaM2: plot.areaM2,
       characterization: { soilType, waterAccess, sunExposure },
       coverUrl: cover?.url,
+      mapUrl: plot.mapSnapshot?.url,
       photoCount: cover?.count ?? 0,
       crops: crops.map((crop) => ({
         id: crop.id,

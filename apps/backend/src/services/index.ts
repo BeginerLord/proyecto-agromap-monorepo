@@ -1,6 +1,7 @@
 export * from './auth.service.js'
 export * from './user.service.js'
 export * from './plot.service.js'
+export * from './map-snapshot.service.js'
 export * from './crop.service.js'
 export * from './field-log.service.js'
 export * from './harvest.service.js'
