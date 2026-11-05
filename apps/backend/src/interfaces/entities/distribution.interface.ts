@@ -6,7 +6,7 @@ export interface DistributionItem {
   quantityKg: number
 }
 
-/** Entrega de alimentos durante una jornada sabatina. */
+/** Entrega de alimentos durante una jornada de apoyo (cualquier día de la semana). */
 export interface Distribution {
   id: string
   date: Date

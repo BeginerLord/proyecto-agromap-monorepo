@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       // Proxy de desarrollo: el front y la API comparten origen → las cookies httpOnly funcionan sin CORS
       proxy: {
         '/api': { target: env.VITE_API_PROXY_TARGET || 'http://localhost:3000', changeOrigin: true },
+        '/uploads': { target: env.VITE_API_PROXY_TARGET || 'http://localhost:3000', changeOrigin: true },
       },
     },
   }

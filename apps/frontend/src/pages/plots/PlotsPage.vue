@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import PlotMap from '@/components/map/PlotMap.vue'
+import PlotMap, { type MapPlot } from '@/components/map/PlotMap.vue'
 import PlotFormModal from '@/components/plots/PlotFormModal.vue'
 import { BaseBadge, BaseButton, BaseCard, BaseIcon, BasePagination, EmptyState, PageHeader, SearchInput } from '@/components/ui'
 import { usePaginatedList } from '@/composables/usePaginatedList'
@@ -21,7 +21,7 @@ const { items, meta, loading, filters, page, load } = usePaginatedList<Plot, Plo
 )
 const formOpen = ref(false)
 
-const open = (plot: Plot) => router.push({ name: ROUTE_NAMES.PLOT_DETAIL, params: { id: plot.id } })
+const open = (plot: MapPlot) => router.push({ name: ROUTE_NAMES.PLOT_DETAIL, params: { id: plot.id } })
 
 onMounted(load)
 </script>

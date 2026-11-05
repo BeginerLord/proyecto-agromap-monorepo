@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import DistributionFormModal from '@/components/distributions/DistributionFormModal.vue'
-import { BaseButton, BaseCard, BaseIcon, BasePagination, EmptyState, PageHeader } from '@/components/ui'
+import MediaManager from '@/components/media/MediaManager.vue'
+import { BaseButton, BaseCard, BaseIcon, BaseModal, BasePagination, EmptyState, PageHeader } from '@/components/ui'
 import { usePaginatedList } from '@/composables/usePaginatedList'
 import { ROLE_GROUPS } from '@/constants'
 import type { Distribution, DistributionQuery } from '@/models'
@@ -11,6 +12,14 @@ import { formatDate, formatKg } from '@/utils/format'
 
 const auth = useAuthStore()
 const canManage = computed(() => auth.hasRole(ROLE_GROUPS.MANAGERS))
+const canField = computed(() => auth.hasRole(ROLE_GROUPS.FIELD_TEAM))
+const photosFor = ref<Distribution | null>(null)
+const photosOpen = computed({
+  get: () => photosFor.value !== null,
+  set: (value: boolean) => {
+    if (!value) photosFor.value = null
+  },
+})
 const formOpen = ref(false)
 
 const { items, meta, loading, page, load } = usePaginatedList<Distribution, DistributionQuery>(
@@ -25,8 +34,8 @@ onMounted(load)
   <div>
     <PageHeader
       eyebrow="Apoyo alimentario"
-      title="Jornadas sabatinas"
-      description="Entregas de alimentos a los estudiantes durante las tutorías de los sábados."
+      title="Jornadas de apoyo"
+      description="Entregas de alimentos a los estudiantes. Las jornadas se realizan entre semana y los fines de semana."
     >
       <template #actions>
         <BaseButton v-if="canManage" icon="plus" @click="formOpen = true">Registrar entrega</BaseButton>
@@ -58,6 +67,9 @@ onMounted(load)
             </li>
           </ul>
           <p v-if="dist.notes" class="faint">{{ dist.notes }}</p>
+          <div>
+            <BaseButton size="sm" variant="secondary" icon="leaf" @click="photosFor = dist">Fotos de la jornada</BaseButton>
+          </div>
         </div>
       </BaseCard>
     </div>
@@ -65,6 +77,9 @@ onMounted(load)
     <BasePagination v-model="page" :meta="meta" />
 
     <DistributionFormModal v-model:open="formOpen" @saved="load" />
+    <BaseModal v-model:open="photosOpen" :title="photosFor?.title ?? 'Fotos'" description="Evidencias de la jornada para el sitio público." :width="760">
+      <MediaManager v-if="photosFor" :owner="{ distributionId: photosFor.id }" :can-edit="canField" />
+    </BaseModal>
   </div>
 </template>
 

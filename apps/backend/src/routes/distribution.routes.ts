@@ -14,7 +14,7 @@ import { authenticate, authorize } from '../middlewares/index.js'
 
 export const distributionRoutes: FastifyPluginAsyncTypebox = async (app) => {
   const ctrl = controllers.distributions
-  const tags = ['Jornadas sabatinas']
+  const tags = ['Jornadas de apoyo']
   const security = [{ cookieAuth: [] }]
 
   app.addHook('preHandler', authenticate)
@@ -23,7 +23,7 @@ export const distributionRoutes: FastifyPluginAsyncTypebox = async (app) => {
     schema: {
       tags,
       security,
-      summary: 'Listar entregas en jornadas sabatinas',
+      summary: 'Listar jornadas de apoyo alimentario',
       querystring: DistributionQueryDto,
       response: { 200: DistributionListResponseDto },
     },

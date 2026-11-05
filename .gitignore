@@ -12,3 +12,6 @@ coverage/
 .idea/
 ~$*.docx
 .claude/
+
+# Evidencias subidas en desarrollo
+apps/backend/uploads/

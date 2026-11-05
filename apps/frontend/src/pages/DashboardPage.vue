@@ -5,14 +5,14 @@ import CropStatusBreakdown from '@/components/dashboard/CropStatusBreakdown.vue'
 import HarvestTimeline from '@/components/dashboard/HarvestTimeline.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import FieldLogList from '@/components/field-logs/FieldLogList.vue'
-import PlotMap from '@/components/map/PlotMap.vue'
+import PlotMap, { type MapPlot } from '@/components/map/PlotMap.vue'
 import { BaseButton, BaseCard, EmptyState, PageHeader } from '@/components/ui'
 import { ROUTE_NAMES } from '@/constants'
 import type { DashboardSummary, Plot } from '@/models'
-import { dashboardService, distributionService, plotService } from '@/services'
+import { dashboardService, plotService } from '@/services'
 import { useAuthStore } from '@/stores/auth.store'
 import { useToastStore } from '@/stores/toast.store'
-import { formatDate, formatKg, formatNumber } from '@/utils/format'
+import { formatKg, formatNumber } from '@/utils/format'
 
 const auth = useAuthStore()
 const toast = useToastStore()
@@ -22,8 +22,7 @@ const plots = shallowRef<Plot[]>([])
 const loading = ref(true)
 
 const firstName = computed(() => auth.user?.name.split(' ')[0] ?? '')
-const openPlot = (plot: Plot) => router.push({ name: ROUTE_NAMES.PLOT_DETAIL, params: { id: plot.id } })
-const nextSaturday = formatDate(new Date(`${distributionService.nextSaturday()}T12:00:00`))
+const openPlot = (plot: MapPlot) => router.push({ name: ROUTE_NAMES.PLOT_DETAIL, params: { id: plot.id } })
 
 onMounted(async () => {
   try {
@@ -41,7 +40,7 @@ onMounted(async () => {
     <PageHeader
       eyebrow="Resumen"
       :title="`Hola, ${firstName}`"
-      :description="`Próxima jornada sabatina: ${nextSaturday}. Esto es lo que está pasando en los predios.`"
+      description="Esto es lo que está pasando en los predios y en las jornadas de apoyo alimentario."
     >
       <template #actions>
         <BaseButton variant="secondary" icon="notebook" @click="router.push({ name: ROUTE_NAMES.FIELD_LOGS })">

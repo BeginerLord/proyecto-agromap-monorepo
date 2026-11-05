@@ -50,7 +50,7 @@ export class DistributionService implements IDistributionService {
       const date = new Date(dto.date)
       return await this.distributions.create({
         date,
-        title: dto.title?.trim() || `Jornada sabatina ${date.toLocaleDateString('es-CO')}`,
+        title: dto.title?.trim() || `Jornada de apoyo ${date.toLocaleDateString('es-CO')}`,
         items,
         totalKg: Number(items.reduce((sum, i) => sum + i.quantityKg, 0).toFixed(2)),
         beneficiaries: dto.beneficiaries,

@@ -46,7 +46,7 @@ export const harvestRoutes: FastifyPluginAsyncTypebox = async (app) => {
       tags,
       security,
       summary: 'Registrar cosecha',
-      description: 'Los kilos quedan disponibles para las jornadas sabatinas.',
+      description: 'Los kilos quedan disponibles para las jornadas de apoyo.',
       body: CreateHarvestDto,
       response: { 201: HarvestResponseDto, 404: errorResponses[404] },
     },

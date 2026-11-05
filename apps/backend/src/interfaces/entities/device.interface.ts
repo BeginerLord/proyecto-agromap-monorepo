@@ -1,4 +1,4 @@
-import type { DeviceStatus } from '../../constants/domain.js'
+import type { DeviceStatus, MetricThreshold } from '../../constants/domain.js'
 import type { CropRef, PlotRef } from '../common/ref.interface.js'
 
 /**
@@ -17,6 +17,7 @@ export interface Device {
   status: DeviceStatus
   lastSeenAt?: Date
   metadata?: Record<string, unknown>
+  thresholds?: Record<string, MetricThreshold>
   createdAt: Date
   updatedAt: Date
 }

@@ -1,4 +1,4 @@
-import type { PaginationQuery, Timestamps, UserRef } from './common.model'
+import type { ISODate, PaginationQuery, Timestamps, UserRef } from './common.model'
 
 export type PlotStatus = 'active' | 'inactive'
 export type WaterAccess = 'none' | 'limited' | 'permanent'
@@ -32,6 +32,8 @@ export interface Plot extends Timestamps {
   areaM2?: number
   characterization: PlotCharacterization
   status: PlotStatus
+  /** Imagen estática de Mapbox guardada al registrar el predio (no consume Mapbox al verse). */
+  mapSnapshot?: { url: string; generatedAt: ISODate }
   createdBy?: UserRef
 }
 

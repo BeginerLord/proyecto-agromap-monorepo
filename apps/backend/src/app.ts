@@ -4,6 +4,7 @@ import { env } from './config/env.js'
 import { errorHandler, NotFoundException } from './exceptions/index.js'
 import { docsPlugin } from './plugins/docs.plugin.js'
 import { securityPlugin } from './plugins/security.plugin.js'
+import { uploadsPlugin } from './plugins/uploads.plugin.js'
 import { apiRoutes } from './routes/index.js'
 
 function loggerOptions(): FastifyServerOptions['logger'] {
@@ -28,6 +29,7 @@ export async function buildApp() {
   })
 
   await app.register(securityPlugin)
+  await app.register(uploadsPlugin)
   await app.register(docsPlugin)
   await app.register(apiRoutes, { prefix: env.apiPrefix })
 
