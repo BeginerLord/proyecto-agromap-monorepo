@@ -1,4 +1,5 @@
 import type { CropRef, ISODate, PaginationQuery, PlotRef, Timestamps, UserRef } from './common.model'
+import type { RecordTraceability } from './traceability.model'
 
 export type FieldLogType =
   | 'sowing'
@@ -36,6 +37,7 @@ export interface FieldLog extends Timestamps {
   author?: UserRef
   source: FieldLogSource
   sensor?: SensorAlertInfo
+  traceability?: RecordTraceability
 }
 
 export interface FieldLogPayload {

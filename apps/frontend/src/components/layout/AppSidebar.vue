@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import logoMark from '@/assets/logo-mark.png'
 import UdecSignature from '@/components/public/UdecSignature.vue'
 import BaseIcon, { type IconName } from '@/components/ui/BaseIcon.vue'
-import { APP_NAME, APP_SUBTITLE, ROLE_GROUPS, ROLES, ROUTE_NAMES, type RouteName } from '@/constants'
+import { APP_NAME, APP_SUBTITLE, ROLE_GROUPS, ROLES, ROUTE_NAMES, SENSORS_ENABLED, type RouteName } from '@/constants'
 import { useAuthStore } from '@/stores/auth.store'
 
 defineProps<{ open: boolean }>()
@@ -42,7 +42,7 @@ const sections: { title: string; items: NavItem[] }[] = [
   {
     title: 'Sistema',
     items: [
-      { to: ROUTE_NAMES.SENSORS, label: 'Sensores', icon: 'sensor' },
+      ...(SENSORS_ENABLED ? [{ to: ROUTE_NAMES.SENSORS, label: 'Sensores', icon: 'sensor' } as NavItem] : []),
       { to: ROUTE_NAMES.COMMENTS, label: 'Experiencias', icon: 'notebook', managersOnly: true },
       { to: ROUTE_NAMES.USERS, label: 'Usuarios', icon: 'users', adminOnly: true },
     ],

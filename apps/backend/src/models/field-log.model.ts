@@ -1,6 +1,7 @@
 import { Schema, model, type InferSchemaType } from 'mongoose'
 import { FIELD_LOG_SOURCES, FIELD_LOG_TYPES } from '../constants/domain.js'
 import { toJSONPlugin } from './plugins/to-json.plugin.js'
+import { recordTraceabilitySchema } from './schemas/record-traceability.schema.js'
 
 const fieldLogSchema = new Schema(
   {
@@ -35,11 +36,13 @@ const fieldLogSchema = new Schema(
         { _id: false },
       ),
     },
+    traceability: { type: recordTraceabilitySchema },
   },
   { timestamps: true, collection: 'field_logs' },
 )
 
 fieldLogSchema.plugin(toJSONPlugin)
+fieldLogSchema.index({ 'traceability.code': 1 }, { unique: true, sparse: true })
 fieldLogSchema.index({ date: -1 })
 fieldLogSchema.index({ 'sensor.device': 1, 'sensor.metric': 1, date: -1 })
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseBadge from '@/components/ui/BaseBadge.vue'
 import BaseIcon from '@/components/ui/BaseIcon.vue'
-import { FIELD_LOG_TYPES } from '@/constants/labels'
+import { EVIDENCE_TYPES, FIELD_LOG_TYPES, RECORD_STATUS } from '@/constants/labels'
 import type { FieldLog } from '@/models'
 import { formatDate } from '@/utils/format'
 
@@ -15,6 +15,15 @@ const emit = defineEmits<{ remove: [log: FieldLog] }>()
       <div class="log__head">
         <BaseBadge :tone="FIELD_LOG_TYPES[log.type].tone">{{ FIELD_LOG_TYPES[log.type].label }}</BaseBadge>
         <span class="faint">{{ formatDate(log.date) }}</span>
+        <template v-if="log.traceability">
+          <span v-if="log.traceability.code" class="faint num">{{ log.traceability.code }}</span>
+          <BaseBadge v-if="log.traceability.recordStatus" :tone="RECORD_STATUS[log.traceability.recordStatus].tone">
+            {{ RECORD_STATUS[log.traceability.recordStatus].label }}
+          </BaseBadge>
+          <BaseBadge v-if="log.traceability.evidence" :tone="EVIDENCE_TYPES[log.traceability.evidence].tone">
+            {{ EVIDENCE_TYPES[log.traceability.evidence].label }}
+          </BaseBadge>
+        </template>
         <button
           v-if="removable?.(log)"
           type="button"
@@ -26,6 +35,7 @@ const emit = defineEmits<{ remove: [log: FieldLog] }>()
         </button>
       </div>
       <p>{{ log.description }}</p>
+      <span v-if="log.traceability?.dataOrigin" class="faint log__origin">Origen del dato: {{ log.traceability.dataOrigin }}</span>
       <span class="faint">
         {{ log.crop.species }} · {{ log.plot.name }} ·
         <template v-if="log.source === 'sensor'">
@@ -61,8 +71,12 @@ const emit = defineEmits<{ remove: [log: FieldLog] }>()
 }
 .log__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+}
+.log__origin {
+  font-size: var(--text-xs);
 }
 .log__remove {
   margin-left: auto;

@@ -12,6 +12,7 @@ import {
   TimestampsDto,
   UserRefDto,
 } from './common.dto.js'
+import { RecordTraceabilityDto } from './traceability.dto.js'
 
 export const FieldLogTypeDto = StringEnum(FIELD_LOG_TYPES)
 
@@ -64,6 +65,7 @@ export const FieldLogResponseDto = Type.Object({
       recordedAt: DateTime,
     }),
   ),
+  traceability: Type.Optional(RecordTraceabilityDto),
   ...TimestampsDto,
 })
 
