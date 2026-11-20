@@ -1,5 +1,6 @@
 import type { HarvestQuality } from '../../constants/domain.js'
 import type { CropRef, PlotRef, UserRef } from '../common/ref.interface.js'
+import type { RecordTraceability } from './traceability.interface.js'
 
 export interface Harvest {
   id: string
@@ -12,6 +13,7 @@ export interface Harvest {
   quality: HarvestQuality
   notes?: string
   registeredBy: UserRef
+  traceability?: RecordTraceability
   createdAt: Date
   updatedAt: Date
 }

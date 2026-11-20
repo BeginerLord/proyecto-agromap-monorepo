@@ -1,5 +1,6 @@
 import type { FieldLogSource, FieldLogType } from '../../constants/domain.js'
 import type { CropRef, PlotRef, UserRef } from '../common/ref.interface.js'
+import type { RecordTraceability } from './traceability.interface.js'
 
 export interface SensorAlertInfo {
   device: string
@@ -25,6 +26,7 @@ export interface FieldLog {
   author?: UserRef
   source: FieldLogSource
   sensor?: SensorAlertInfo
+  traceability?: RecordTraceability
   createdAt: Date
   updatedAt: Date
 }

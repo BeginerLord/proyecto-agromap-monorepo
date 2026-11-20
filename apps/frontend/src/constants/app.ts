@@ -15,3 +15,6 @@ export const PAGE_SIZE = 12
 
 /** Modo temporal sin login: debe coincidir con AUTH_BYPASS del backend. */
 export const AUTH_BYPASS = import.meta.env.VITE_AUTH_BYPASS === 'true'
+
+/** Módulo de sensores (oculto por ahora). Poner VITE_SENSORS_ENABLED=true para mostrarlo de nuevo. */
+export const SENSORS_ENABLED = import.meta.env.VITE_SENSORS_ENABLED === 'true'

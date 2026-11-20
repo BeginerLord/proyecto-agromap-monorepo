@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { ROLE_GROUPS, ROLES, ROUTE_NAMES, type Role } from '@/constants'
+import { ROLE_GROUPS, ROLES, ROUTE_NAMES, SENSORS_ENABLED, type Role } from '@/constants'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -96,7 +96,10 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/reports/ReportsPage.vue'),
         meta: { title: 'Estadísticas y reportes' },
       },
-      { path: 'sensors', name: ROUTE_NAMES.SENSORS, component: () => import('@/pages/sensors/SensorsPage.vue'), meta: { title: 'Sensores' } },
+      // Sensores oculto por ahora (VITE_SENSORS_ENABLED): la URL redirige al resumen
+      SENSORS_ENABLED
+        ? { path: 'sensors', name: ROUTE_NAMES.SENSORS, component: () => import('@/pages/sensors/SensorsPage.vue'), meta: { title: 'Sensores' } }
+        : { path: 'sensors', name: ROUTE_NAMES.SENSORS, redirect: { name: ROUTE_NAMES.DASHBOARD } },
       {
         path: 'comments',
         name: ROUTE_NAMES.COMMENTS,

@@ -1,4 +1,5 @@
 export * from './common.dto.js'
+export * from './traceability.dto.js'
 export * from './auth.dto.js'
 export * from './user.dto.js'
 export * from './plot.dto.js'

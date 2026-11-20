@@ -1,4 +1,5 @@
 import type { CropRef, ISODate, PaginationQuery, PlotRef, Timestamps, UserRef } from './common.model'
+import type { RecordTraceability } from './traceability.model'
 
 export type HarvestQuality = 'high' | 'medium' | 'low'
 
@@ -12,6 +13,7 @@ export interface Harvest extends Timestamps {
   quality: HarvestQuality
   notes?: string
   registeredBy: UserRef
+  traceability?: RecordTraceability
 }
 
 export interface HarvestPayload {
