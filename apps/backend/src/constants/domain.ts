@@ -27,6 +27,14 @@ export type FieldLogType = (typeof FIELD_LOG_TYPES)[number]
 export const FIELD_LOG_SOURCES = ['manual', 'sensor'] as const
 export type FieldLogSource = (typeof FIELD_LOG_SOURCES)[number]
 
+/** Respaldo de un dato de trazabilidad: foto, testimonio de la familia o ninguno. */
+export const EVIDENCE_TYPES = ['photo', 'testimony', 'none'] as const
+export type EvidenceType = (typeof EVIDENCE_TYPES)[number]
+
+/** Estado de verificación de un registro de trazabilidad. */
+export const RECORD_STATUS = ['pending', 'to_verify', 'verified'] as const
+export type RecordStatus = (typeof RECORD_STATUS)[number]
+
 export const HARVEST_QUALITY = ['high', 'medium', 'low'] as const
 export type HarvestQuality = (typeof HARVEST_QUALITY)[number]
 

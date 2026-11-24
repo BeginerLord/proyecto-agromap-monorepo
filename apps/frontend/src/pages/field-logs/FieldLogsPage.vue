@@ -5,7 +5,7 @@ import FieldLogList from '@/components/field-logs/FieldLogList.vue'
 import { BaseButton, BaseCard, BasePagination, BaseSelect, EmptyState, PageHeader, SearchInput } from '@/components/ui'
 import { useAsyncAction } from '@/composables/useAsyncAction'
 import { usePaginatedList } from '@/composables/usePaginatedList'
-import { FIELD_LOG_TYPES, ROLES, toOptions } from '@/constants'
+import { FIELD_LOG_TYPES, ROLES, SENSORS_ENABLED, toOptions } from '@/constants'
 import type { Crop, FieldLog, FieldLogQuery, FieldLogSource, FieldLogType } from '@/models'
 import { cropService, fieldLogService } from '@/services'
 import { useAuthStore } from '@/stores/auth.store'
@@ -22,6 +22,7 @@ const { items, meta, loading, filters, page, load } = usePaginatedList<FieldLog,
 
 const canRemove = (log: FieldLog) =>
   (!!log.author && log.author.id === auth.user?.id) || auth.hasRole([ROLES.ADMIN])
+const typeOptions = toOptions(FIELD_LOG_TYPES).filter((option) => SENSORS_ENABLED || option.value !== 'sensor_alert')
 const sourceOptions = [
   { value: 'manual', label: 'Registradas por el equipo' },
   { value: 'sensor', label: 'Alertas de sensores' },
@@ -44,7 +45,11 @@ onMounted(async () => {
     <PageHeader
       eyebrow="Fase III · Seguimiento"
       title="Bitácora de campo"
-      description="Riegos, fertilizaciones, controles fitosanitarios y observaciones de cada cultivo. Las lecturas de sensores fuera de rango se registran aquí automáticamente."
+      :description="
+        SENSORS_ENABLED
+          ? 'Riegos, fertilizaciones, controles fitosanitarios y observaciones de cada cultivo. Las lecturas de sensores fuera de rango se registran aquí automáticamente.'
+          : 'Riegos, fertilizaciones, controles fitosanitarios y observaciones de cada cultivo.'
+      "
     >
       <template #actions>
         <BaseButton icon="plus" @click="formOpen = true">Nuevo registro</BaseButton>
@@ -54,8 +59,8 @@ onMounted(async () => {
     <BaseCard>
       <div class="filters">
         <SearchInput v-model="filters.search" placeholder="Buscar en descripciones" />
-        <BaseSelect v-model="filters.type" :options="toOptions(FIELD_LOG_TYPES)" placeholder="Todas las actividades" />
-        <BaseSelect v-model="filters.source" :options="sourceOptions" placeholder="Todos los orígenes" />
+        <BaseSelect v-model="filters.type" :options="typeOptions" placeholder="Todas las actividades" />
+        <BaseSelect v-if="SENSORS_ENABLED" v-model="filters.source" :options="sourceOptions" placeholder="Todos los orígenes" />
       </div>
       <EmptyState v-if="!loading && !items.length" icon="notebook" title="Sin registros" description="Agrega la primera actividad de campo." />
       <FieldLogList v-else :logs="items" :removable="canRemove" @remove="remove" />
