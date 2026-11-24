@@ -11,6 +11,7 @@ import {
   TimestampsDto,
   UserRefDto,
 } from './common.dto.js'
+import { CropTraceabilityDto } from './traceability.dto.js'
 
 export const CropStatusDto = StringEnum(CROP_STATUS)
 
@@ -56,6 +57,7 @@ export const CropResponseDto = Type.Object({
   areaM2: Type.Optional(Type.Number()),
   plantCount: Type.Optional(Type.Integer()),
   notes: Type.Optional(Type.String()),
+  traceability: Type.Optional(CropTraceabilityDto),
   createdBy: Type.Optional(UserRefDto),
   ...TimestampsDto,
 })

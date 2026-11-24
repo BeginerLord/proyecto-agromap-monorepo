@@ -1,4 +1,5 @@
 import type { ISODate, PaginationQuery, PlotRef, Timestamps, UserRef } from './common.model'
+import type { CropTraceability } from './traceability.model'
 
 export type CropStatus = 'planned' | 'planted' | 'growing' | 'harvesting' | 'finished' | 'lost'
 
@@ -14,6 +15,7 @@ export interface Crop extends Timestamps {
   areaM2?: number
   plantCount?: number
   notes?: string
+  traceability?: CropTraceability
   createdBy?: UserRef
 }
 

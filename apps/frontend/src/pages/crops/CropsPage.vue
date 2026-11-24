@@ -5,7 +5,7 @@ import CropProgress from '@/components/crops/CropProgress.vue'
 import { BaseBadge, BaseButton, BaseCard, BasePagination, BaseSelect, EmptyState, PageHeader, SearchInput } from '@/components/ui'
 import { useAsyncAction } from '@/composables/useAsyncAction'
 import { usePaginatedList } from '@/composables/usePaginatedList'
-import { CROP_STATUS, ROLE_GROUPS, toOptions } from '@/constants'
+import { CROP_STATUS, EVIDENCE_TYPES, ROLE_GROUPS, toOptions } from '@/constants'
 import type { Crop, CropQuery, CropStatus, Plot } from '@/models'
 import { cropService, plotService } from '@/services'
 import { useAuthStore } from '@/stores/auth.store'
@@ -76,6 +76,12 @@ onMounted(async () => {
             <BaseBadge :tone="CROP_STATUS[crop.status].tone">{{ CROP_STATUS[crop.status].label }}</BaseBadge>
             <span class="faint">{{ crop.plot.name }}</span>
           </div>
+          <div v-if="crop.traceability?.lotCode" class="row crop__lot">
+            <span class="faint num">{{ crop.traceability.lotCode }}</span>
+            <BaseBadge v-if="crop.traceability.evidence" :tone="EVIDENCE_TYPES[crop.traceability.evidence].tone">
+              {{ EVIDENCE_TYPES[crop.traceability.evidence].label }}
+            </BaseBadge>
+          </div>
           <div>
             <h3>{{ crop.species }}</h3>
             <p v-if="crop.variety" class="muted">{{ crop.variety }}</p>
@@ -86,6 +92,45 @@ onMounted(async () => {
             <div><dt class="faint">Plantas</dt><dd class="num">{{ crop.plantCount ?? '—' }}</dd></div>
           </dl>
           <CropProgress :crop="crop" />
+          <details v-if="crop.traceability" class="crop__trace">
+            <summary>Trazabilidad del lote</summary>
+            <dl>
+              <div v-if="crop.traceability.initialQuantity !== undefined">
+                <dt class="faint">Cantidad inicial</dt>
+                <dd>{{ crop.traceability.initialQuantity }} · {{ crop.traceability.quantityUnit ?? 'unidad por confirmar' }}</dd>
+              </div>
+              <div v-if="crop.traceability.sowingMethod"><dt class="faint">Tipo de siembra</dt><dd>{{ crop.traceability.sowingMethod }}</dd></div>
+              <div v-if="crop.traceability.firstHarvestAt">
+                <dt class="faint">Primera cosecha real</dt><dd>{{ formatDate(crop.traceability.firstHarvestAt) }}</dd>
+              </div>
+              <div v-if="crop.traceability.harvestEndAt">
+                <dt class="faint">Fin de cosecha est.</dt><dd>{{ formatDate(crop.traceability.harvestEndAt) }}</dd>
+              </div>
+              <div v-if="crop.traceability.cycleReference">
+                <dt class="faint">Ciclo de referencia</dt><dd>{{ crop.traceability.cycleReference }}</dd>
+              </div>
+            </dl>
+            <p v-if="crop.notes" class="muted">{{ crop.notes }}</p>
+            <template v-if="crop.traceability.sources?.length">
+              <strong class="crop__trace-title">Fuentes</strong>
+              <ul>
+                <li v-for="source in crop.traceability.sources" :key="source.source">
+                  <a v-if="source.url" :href="source.url" target="_blank" rel="noopener noreferrer">{{ source.source }}</a>
+                  <span v-else>{{ source.source }}</span>
+                  <span class="faint"> — {{ source.data }}</span>
+                </li>
+              </ul>
+            </template>
+            <template v-if="crop.traceability.schedule?.length">
+              <strong class="crop__trace-title">Cronograma de referencia</strong>
+              <ul>
+                <li v-for="item in crop.traceability.schedule" :key="item.period + item.milestone">
+                  <span class="num">{{ item.period }}</span> · {{ item.milestone }}
+                  <span v-if="item.infoType" class="faint"> ({{ item.infoType }})</span>
+                </li>
+              </ul>
+            </template>
+          </details>
           <div v-if="canField" class="crop__actions">
             <select
               class="crop__status"
@@ -133,6 +178,39 @@ onMounted(async () => {
 .crop__facts dd {
   margin: 0;
   font-weight: 500;
+}
+.crop__lot {
+  gap: var(--space-2);
+  margin-top: calc(-1 * var(--space-2));
+}
+.crop__trace {
+  font-size: var(--text-sm);
+}
+.crop__trace summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+.crop__trace dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+}
+.crop__trace dd {
+  margin: 0;
+}
+.crop__trace ul {
+  margin: var(--space-1) 0 var(--space-3);
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.crop__trace a {
+  overflow-wrap: anywhere;
+}
+.crop__trace-title {
+  display: block;
+  margin-top: var(--space-2);
 }
 .crop__actions {
   display: flex;

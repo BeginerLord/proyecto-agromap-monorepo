@@ -1,6 +1,7 @@
 import { Schema, model, type InferSchemaType } from 'mongoose'
 import { HARVEST_QUALITY } from '../constants/domain.js'
 import { toJSONPlugin } from './plugins/to-json.plugin.js'
+import { recordTraceabilitySchema } from './schemas/record-traceability.schema.js'
 
 const harvestSchema = new Schema(
   {
@@ -12,11 +13,13 @@ const harvestSchema = new Schema(
     quality: { type: String, enum: HARVEST_QUALITY, default: 'medium' },
     notes: { type: String, trim: true },
     registeredBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    traceability: { type: recordTraceabilitySchema },
   },
   { timestamps: true, collection: 'harvests' },
 )
 
 harvestSchema.plugin(toJSONPlugin)
+harvestSchema.index({ 'traceability.code': 1 }, { unique: true, sparse: true })
 harvestSchema.index({ harvestedAt: -1 })
 
 export type HarvestDocument = InferSchemaType<typeof harvestSchema>
