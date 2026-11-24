@@ -17,7 +17,22 @@ export const PROJECT_VIDEOS: ProjectVideo[] = [
     description: 'El recorrido completo de AgroMap-Cereté: los cultivos, las jornadas de apoyo y lo que logramos.',
     src: '/uploads/agromap/videos/resultado-final.mp4',
   },
-  { id: 'video-2', title: 'Video 2', description: 'Muy pronto publicaremos este video.' },
-  { id: 'video-3', title: 'Video 3', description: 'Muy pronto publicaremos este video.' },
-  { id: 'video-4', title: 'Video 4', description: 'Muy pronto publicaremos este video.' },
+  {
+    id: 'video-2',
+    title: 'Video 2',
+    description: 'Video del proyecto AgroMap-Cereté.',
+    src: '/uploads/agromap/videos/video-2.mp4',
+  },
+  {
+    id: 'video-3',
+    title: 'Video 3',
+    description: 'Video del proyecto AgroMap-Cereté.',
+    src: '/uploads/agromap/videos/video-3.mp4',
+  },
+  {
+    id: 'video-4',
+    title: 'Video 4',
+    description: 'Video del proyecto AgroMap-Cereté.',
+    src: '/uploads/agromap/videos/video-4.mp4',
+  },
 ]
