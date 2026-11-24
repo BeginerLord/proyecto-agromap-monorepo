@@ -64,6 +64,22 @@ export class S3FileStorage implements IFileStorage {
     return { key, url: this.urlFor(key) }
   }
 
+  /** Sube un archivo grande (video) con una clave fija, sin cargarlo en memoria. */
+  async saveAs(relativeKey: string, body: Readable, contentLength: number, contentType: string): Promise<StoredFile> {
+    const key = `${this.config.keyPrefix}${relativeKey}`
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.config.bucket,
+        Key: key,
+        Body: body,
+        ContentLength: contentLength,
+        ContentType: contentType,
+        CacheControl: 'public, max-age=86400',
+      }),
+    )
+    return { key, url: this.urlFor(key) }
+  }
+
   async remove(key: string): Promise<void> {
     await this.client.send(new DeleteObjectCommand({ Bucket: this.config.bucket, Key: key }))
   }
@@ -73,15 +89,16 @@ export class S3FileStorage implements IFileStorage {
     return base ? `${base}/${key}` : `${this.config.proxyPath}${key}`
   }
 
-  async get(key: string): Promise<StoredObject | null> {
+  async get(key: string, range?: string): Promise<StoredObject | null> {
     try {
-      const object = await this.client.send(new GetObjectCommand({ Bucket: this.config.bucket, Key: key }))
+      const object = await this.client.send(new GetObjectCommand({ Bucket: this.config.bucket, Key: key, Range: range }))
       if (!object.Body) return null
       return {
         body: object.Body as Readable,
         contentType: object.ContentType,
         contentLength: object.ContentLength,
         etag: object.ETag,
+        contentRange: object.ContentRange,
       }
     } catch (error) {
       const status = (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode

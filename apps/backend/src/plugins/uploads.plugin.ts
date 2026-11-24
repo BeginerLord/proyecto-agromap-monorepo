@@ -6,7 +6,7 @@ import { fileStorage } from '../container.js'
 import { NotFoundException } from '../exceptions/index.js'
 
 /** Claves válidas: UUID con prefijo opcional de carpetas; impide rutas como "../". */
-const SAFE_KEY = /^(?:[\w-]+\/)*[\w-]+\.(?:webp|png|jpe?g)$/i
+const SAFE_KEY = /^(?:[\w-]+\/)*[\w-]+\.(?:webp|png|jpe?g|mp4)$/i
 
 /**
  * Sirve /uploads/* desde el almacenamiento activo:
@@ -27,9 +27,13 @@ export const uploadsPlugin = fp(async (app: FastifyInstance) => {
 
       // Primero el disco (gratis, archivos aún no migrados) y luego B2: así un fallo de B2
       // no impide mostrar lo que sigue en disco, y no se gasta una descarga de B2 en ellos.
-      const object = (await legacy?.get(key)) ?? (await fileStorage.get(key))
+      // Range: los videos necesitan rangos para poder adelantar/retroceder sin descargar todo
+      const range = request.headers.range
+      const object = (await legacy?.get(key, range)) ?? (await fileStorage.get(key, range))
       if (!object) throw new NotFoundException('Archivo')
 
+      reply.header('Accept-Ranges', 'bytes')
+      if (object.contentRange) reply.code(206).header('Content-Range', object.contentRange)
       reply.header('Cache-Control', IMMUTABLE_CACHE).type(object.contentType ?? 'application/octet-stream')
       if (object.contentLength) reply.header('Content-Length', object.contentLength)
       if (object.etag) reply.header('ETag', object.etag)
