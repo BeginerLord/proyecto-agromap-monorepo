@@ -20,6 +20,8 @@ export interface StoredObject {
   contentType?: string
   contentLength?: number
   etag?: string
+  /** Presente cuando se atendió un rango (HTTP 206), p. ej. "bytes 0-1023/4096". */
+  contentRange?: string
 }
 
 /**
@@ -35,5 +37,5 @@ export interface IFileStorage {
   /** URL pública de una clave ya guardada. */
   urlFor(key: string): string
   /** Lee un objeto para servirlo a través de la API (null si no existe). */
-  get(key: string): Promise<StoredObject | null>
+  get(key: string, range?: string): Promise<StoredObject | null>
 }

@@ -6,6 +6,7 @@ import CommentList from '@/components/public/CommentList.vue'
 import DistributionStory from '@/components/public/DistributionStory.vue'
 import PhotoGallery from '@/components/public/PhotoGallery.vue'
 import PublicPlotCard from '@/components/public/PublicPlotCard.vue'
+import VideoShowcase from '@/components/public/VideoShowcase.vue'
 import { BaseButton } from '@/components/ui'
 import { ROUTE_NAMES } from '@/constants'
 import type { PublicComment, PublicDistribution, PublicMedia, PublicOverview, PublicPlot } from '@/models'
@@ -72,6 +73,17 @@ onMounted(async () => {
       <div class="stat"><strong class="num">{{ overview.activeCrops }}</strong><span>cultivos en marcha</span></div>
       <div class="stat"><strong class="num">{{ formatKg(overview.harvestedKg) }}</strong><span>cosechados</span></div>
       <div class="stat"><strong class="num">{{ formatNumber(overview.beneficiaries) }}</strong><span>apoyos a estudiantes</span></div>
+    </section>
+
+    <!-- Videos -->
+    <section id="videos" class="section">
+      <header class="section__head">
+        <div>
+          <span class="eyebrow">Resultado final</span>
+          <h2>Videos del proyecto</h2>
+        </div>
+      </header>
+      <VideoShowcase />
     </section>
 
     <!-- Mapa + próximas cosechas -->
