@@ -1,5 +1,6 @@
 import type { CropStatus } from '../../constants/domain.js'
 import type { PlotRef, UserRef } from '../common/ref.interface.js'
+import type { CropTraceability } from './traceability.interface.js'
 
 export interface Crop {
   id: string
@@ -14,6 +15,7 @@ export interface Crop {
   areaM2?: number
   plantCount?: number
   notes?: string
+  traceability?: CropTraceability
   createdBy?: UserRef
   createdAt: Date
   updatedAt: Date

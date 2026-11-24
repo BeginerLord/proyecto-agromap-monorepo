@@ -3,7 +3,9 @@ import type {
   CommentStatus,
   CropStatus,
   FieldLogType,
+  EvidenceType,
   HarvestQuality,
+  RecordStatus,
   SunExposure,
   WaterAccess,
 } from '@/models'
@@ -38,6 +40,18 @@ export const FIELD_LOG_TYPES: Record<FieldLogType, { label: string; tone: Tone }
   harvest: { label: 'Cosecha', tone: 'sun' },
   sensor_alert: { label: 'Alerta de sensor', tone: 'clay' },
   other: { label: 'Otro', tone: 'neutral' },
+}
+
+export const EVIDENCE_TYPES: Record<EvidenceType, { label: string; tone: Tone }> = {
+  photo: { label: 'Con foto', tone: 'leaf' },
+  testimony: { label: 'Testimonio', tone: 'sun' },
+  none: { label: 'Sin evidencia', tone: 'clay' },
+}
+
+export const RECORD_STATUS: Record<RecordStatus, { label: string; tone: Tone }> = {
+  pending: { label: 'Pendiente de completar', tone: 'clay' },
+  to_verify: { label: 'Por verificar', tone: 'sun' },
+  verified: { label: 'Verificado', tone: 'leaf' },
 }
 
 export const HARVEST_QUALITY: Record<HarvestQuality, { label: string; tone: Tone }> = {

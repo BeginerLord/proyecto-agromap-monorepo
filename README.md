@@ -36,8 +36,19 @@ copia `.env.example` a `.env` en `apps/backend` y `apps/frontend` y genera secre
 pnpm seed
 ```
 
-Carga un administrador, un agrónomo, los dos predios del piloto y cultivos de ejemplo. Las
-credenciales de prueba están en `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` (`apps/backend/.env`) y
+Carga un administrador, un agrónomo, los dos predios del piloto (**Predio Martínez** y **Predio Mateo Gómez**,
+con cultivos de ejemplo) y la **trazabilidad agrícola 2026 de la Granja Avícola Doctora Pollo**
+(datos de `Agromap_Trazabilidad_Agricola_2026.xlsx`, en `apps/backend/src/scripts/seed-data`): el predio,
+los cinco lotes (berenjena, ají, yuca, pepino y habichuela, códigos `AGR-2026-00x`) con su cronograma de
+referencia y fuentes bibliográficas, 21 actividades de bitácora (`ACT-xxx`) y 4 cosechas (`COS-2026-00x`).
+Cada registro indica si el dato es real o estimado, su estado (pendiente / por verificar) y su evidencia
+(foto o testimonio). Es idempotente: no duplica ni sobrescribe lo que ya exista.
+
+- `pnpm seed -- --refresh` vuelve a escribir los registros del seed con los datos del Excel.
+- `SEED_PHOTOS_DIR=D:/Workspace/Datos pnpm seed` sube además las 23 fotos de evidencia (en WebP), asociadas
+  a su lote o al predio.
+
+Las credenciales de prueba están en `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` (`apps/backend/.env`) y
 en `apps/backend/src/scripts/seed.ts`.
 
 ```bash
@@ -88,7 +99,7 @@ Para volver a exigir login, pon ambas variables en `false` y reconstruye (`docke
 | `pnpm dev:api` / `pnpm dev:web` | Solo una de las apps |
 | `pnpm build` | Compila ambas apps (`dist/`) |
 | `pnpm typecheck` | Verificación de tipos de todo el monorepo |
-| `pnpm seed` | Datos de ejemplo en MongoDB |
+| `pnpm seed` | Predios Martínez y Mateo Gómez + trazabilidad 2026 de la Granja Doctora Pollo |
 
 ## Backend (`apps/backend`)
 
@@ -162,6 +173,9 @@ a CSV o PDF desde `/panel/reports`), sitio público y sensores.
   (Docker: `docker compose exec backend node dist/scripts/storage-migrate.js`).
 
 ### Sensores (patrón Adapter)
+
+> **Oculto por ahora.** El panel no muestra el menú, la página ni los filtros de sensores mientras
+> `VITE_SENSORS_ENABLED` (frontend) no sea `true`; en el backend `SENSORS_ENABLED=false` lo desactiva.
 
 Los dispositivos aún no están definidos, así que la integración vive en
 [`apps/backend/src/adapters/sensors`](apps/backend/src/adapters/sensors/README.md): un contrato

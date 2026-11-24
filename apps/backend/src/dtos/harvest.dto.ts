@@ -12,6 +12,7 @@ import {
   TimestampsDto,
   UserRefDto,
 } from './common.dto.js'
+import { RecordTraceabilityDto } from './traceability.dto.js'
 
 export const HarvestQualityDto = StringEnum(HARVEST_QUALITY)
 
@@ -45,6 +46,7 @@ export const HarvestResponseDto = Type.Object({
   quality: HarvestQualityDto,
   notes: Type.Optional(Type.String()),
   registeredBy: UserRefDto,
+  traceability: Type.Optional(RecordTraceabilityDto),
   ...TimestampsDto,
 })
 
