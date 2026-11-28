@@ -44,7 +44,7 @@ onMounted(async () => {
     <section class="hero">
       <div class="hero__copy">
         <span class="eyebrow">Seguridad alimentaria estudiantil · Cereté</span>
-        <h1>Sembramos en los predios periurbanos para que ningún estudiante estudie con hambre.</h1>
+        <h1>Cosechas periurbanas para el desarrollo y la sostenibilidad alimentaria.</h1>
         <p class="muted">
           AgroMap-Cereté documenta los cultivos de ciclo corto de Martínez y Mateo Gómez y las jornadas de apoyo
           alimentario del Centro Tutorial Cereté, que se realizan entre semana y los fines de semana.
