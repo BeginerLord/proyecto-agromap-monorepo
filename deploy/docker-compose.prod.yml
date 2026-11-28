@@ -1,0 +1,91 @@
+# Producción: https://agromap.com.co
+#   Nginx (80/443) → frontend (nginx + SPA) → backend (Fastify) → MongoDB (stack aparte)
+#
+# Requisitos: el stack de MongoDB (~/mongodb-stack) levantado y deploy/.env creado
+# a partir de deploy/.env.example. Primer arranque con certificado: ./deploy/init-letsencrypt.sh
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build
+
+name: agromap-prod
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../apps/backend/.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      # MongoDB del stack ~/mongodb-stack, alcanzable por su proxy en la red "edge"
+      MONGO_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo-nginx:27017/${MONGO_APP_DB}?authSource=${MONGO_APP_DB}
+      CORS_ORIGIN: https://${DOMAIN}
+      COOKIE_SECURE: "true"
+      UPLOADS_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - internal
+      - mongo_edge
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        # Debe coincidir con AUTH_BYPASS del backend
+        VITE_AUTH_BYPASS: ${VITE_AUTH_BYPASS:-false}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - uploads-cache:/var/cache/nginx/uploads
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/agromap.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - certbot-www:/var/www/certbot:ro
+      - letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - internal
+    # Recarga cada 6 h para tomar los certificados renovados
+    command: >
+      /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done &
+      exec /docker-entrypoint.sh nginx -g 'daemon off;'"
+
+  certbot:
+    image: certbot/certbot:latest
+    restart: unless-stopped
+    volumes:
+      - certbot-www:/var/www/certbot
+      - letsencrypt:/etc/letsencrypt
+    # Intenta renovar dos veces al día (solo renueva si faltan menos de 30 días)
+    entrypoint: >
+      /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet;
+      sleep 12h & wait $${!}; done"
+
+networks:
+  internal:
+  mongo_edge:
+    external: true
+    name: ${MONGO_EDGE_NETWORK:-mongodb-stack_edge}
+
+volumes:
+  uploads:
+  uploads-cache:
+  certbot-www:
+  letsencrypt:
